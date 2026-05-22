@@ -1,49 +1,43 @@
-import pandas as pd
-import numpy as np
-from scipy.stats import poisson
+import asyncio
+from datetime import datetime
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-print("✅ İddaa Analiz Programı Başladı!\n")
+from config import BOT_TOKEN, CHANNEL_ID
+from scraper import get_iddaa_matches
+from analyzer import analyze_matches
+from sender import send_to_channel
 
-# Takım Verileri
-takimlar = {
-    "Galatasaray": {"ev_gol": 2.1, "dep_gol": 1.8, "form": 4.2},
-    "Fenerbahce": {"ev_gol": 2.3, "dep_gol": 1.6, "form": 3.8},
-    "Besiktas": {"ev_gol": 1.7, "dep_gol": 1.4, "form": 3.5},
-    "Trabzonspor": {"ev_gol": 1.9, "dep_gol": 1.5, "form": 3.9},
-    "Sivasspor": {"ev_gol": 1.4, "dep_gol": 1.2, "form": 3.0}
-}
+async def daily_analysis():
+    print(f"[{datetime.now()}] İddaa analizi başlatılıyor...")
+    
+    matches = get_iddaa_matches()
+    good_bets = analyze_matches(matches)
+    
+    if not good_bets:
+        message = "🔍 Bugün kaliteli bahis bulunamadı."
+    else:
+        message = f"🔥 **Günün İddaa Analizi** 🔥\n"
+        message += f"📅 {datetime.now().strftime('%d %B %Y')}\n\n"
+        
+        for bet in good_bets:
+            message += f"**{bet['time']}** | {bet['league']}\n"
+            message += f"{bet['match']}\n"
+            message += f"💡 **{bet['tip']}** @ {bet['odds']}\n"
+            message += f"📌 {bet['reason']}\n\n"
+        
+        message += "⚠️ Sorumlu Oyna | Bu sadece analizdir."
+    
+    await send_to_channel(BOT_TOKEN, CHANNEL_ID, message)
 
-def mac_analiz_et(ev_takimi, dep_takimi):
-    if ev_takimi not in takimlar or dep_takimi not in takimlar:
-        print("❌ Takım verisi eksik!")
-        return
+if __name__ == "__main__":
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(daily_analysis, 'cron', hour=12, minute=0)   # Her gün 12:00
+    scheduler.add_job(daily_analysis, 'cron', hour=18, minute=30)  # Her gün 18:30
     
-    ev = takimlar[ev_takimi]
-    dep = takimlar[dep_takimi]
+    print("🤖 İddaa Botu çalışıyor...")
+    scheduler.start()
     
-    ev_gol = (ev["ev_gol"] + dep["dep_gol"]) / 2 * 1.15
-    dep_gol = (dep["dep_gol"] + ev["ev_gol"]) / 2 * 0.9
-    
-    ev_win = 0
-    draw = 0
-    dep_win = 0
-    
-    for h in range(0, 7):
-        for a in range(0, 7):
-            prob = poisson.pmf(h, ev_gol) * poisson.pmf(a, dep_gol)
-            if h > a:
-                ev_win += prob
-            elif h == a:
-                draw += prob
-            else:
-                dep_win += prob
-    
-    print(f"\n🏠 {ev_takimi} - {dep_takimi}")
-    print(f"Ev Galibiyeti : %{ev_win*100:.1f}")
-    print(f"Beraberlik    : %{draw*100:.1f}")
-    print(f"Deplasman     : %{dep_win*100:.1f}")
-    print(f"Beklenen Gol  : {ev_gol:.2f} - {dep_gol:.2f}")
-
-# Test maçları
-mac_analiz_et("Galatasaray", "Fenerbahce")
-mac_analiz_et("Besiktas", "Trabzonspor")
+    try:
+        asyncio.get_event_loop().run_forever()
+    except (KeyboardInterrupt, SystemExit):
+        pass
