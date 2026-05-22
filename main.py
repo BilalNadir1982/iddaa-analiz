@@ -39,3 +39,10 @@ if __name__ == "__main__":
         print("Yerel modda çalıştırıyorsun. Scheduler devre dışı.")
         asyncio.run(run_analysis())
         print("RUN ONCE STARTED")
+        import os
+
+if os.path.exists("sent.txt"):
+    print("Already sent today, exiting")
+    exit()
+
+open("sent.txt", "w").write("sent")
