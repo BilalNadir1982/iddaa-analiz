@@ -1,0 +1,35 @@
+name: İddaa Bot - Günlük Analiz
+
+on:
+  schedule:
+    - cron: '0 9 * * *'     # Her gün 09:00 (Türkiye saati)
+    - cron: '0 17 * * *'    # Her gün 17:00 (Türkiye saati)
+  workflow_dispatch:        # Manuel tetikleme için (test etmek için)
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repoyu Çek
+        uses: actions/checkout@v4
+
+      - name: Python Kurulumu
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Bağımlılıkları Yükle
+        run: |
+          pip install -r requirements.txt
+
+      - name: Environment Variables
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+        run: |
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
+          echo "CHANNEL_ID=${{ secrets.CHANNEL_ID }}" >> .env
+
+      - name: Analizi Çalıştır
+        run: python main.py --run-once
