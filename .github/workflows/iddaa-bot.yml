@@ -29,5 +29,5 @@ jobs:
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
           echo "CHANNEL_ID=${{ secrets.CHANNEL_ID }}" >> .env
 
-      - name: Analizi Çalıştır
-        run: python main.py --run-once
+      - name: Reset daily state
+  run: rm -f sent.txt
