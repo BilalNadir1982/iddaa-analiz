@@ -38,3 +38,4 @@ if __name__ == "__main__":
         # Yerel makinede test etmek için
         print("Yerel modda çalıştırıyorsun. Scheduler devre dışı.")
         asyncio.run(run_analysis())
+        print("RUN ONCE STARTED")
