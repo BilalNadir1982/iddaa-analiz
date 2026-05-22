@@ -31,4 +31,3 @@ jobs:
 
       - name: Analizi Çalıştır
         run: python main.py --run-once
-
