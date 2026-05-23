@@ -1,20 +1,15 @@
 import requests
-import os
-from datetime import date
+from config import ODDS_API_KEY
 
-API_KEY = os.getenv("FOOTBALL_API_KEY")
+def get_odds():
+    url = "https://api.the-odds-api.com/v4/sports/soccer/odds"
 
-headers = {
-    "x-apisports-key": API_KEY
-}
+    params = {
+        "apiKey": ODDS_API_KEY,
+        "regions": "eu",
+        "markets": "h2h,totals",
+        "oddsFormat": "decimal"
+    }
 
-def get_matches():
-    today = str(date.today())
-
-    url = f"https://v3.football.api-sports.io/fixtures?date={today}"
-
-    r = requests.get(url, headers=headers)
-
-    data = r.json()
-
-    return data["response"]
+    r = requests.get(url, params=params)
+    return r.json()
