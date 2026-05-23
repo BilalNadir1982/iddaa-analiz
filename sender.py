@@ -12,4 +12,4 @@ def send_to_channel(msg):
         "text": msg
     })
 
-    print("RESPONSE:", r.text)
+    print("TELEGRAM RESPONSE:", r.text)
