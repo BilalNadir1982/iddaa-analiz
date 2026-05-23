@@ -2,6 +2,7 @@ import requests
 from config import ODDS_API_KEY
 
 def get_matches():
+
     url = "https://api.the-odds-api.com/v4/sports/soccer/odds"
 
     params = {
@@ -15,7 +16,14 @@ def get_matches():
 
     data = r.json()
 
-    # ⚠️ güvenli dönüş
+    # 🔥 DEBUG
+    print("API RESPONSE TYPE:", type(data))
+    print("API LENGTH:", len(data) if isinstance(data, list) else "NO LIST")
+
+    # güvenli dönüş
+    if not data:
+        return []
+
     if isinstance(data, list):
         return data
 
