@@ -1,7 +1,1 @@
-python-telegram-bot==21.4
 requests
-beautifulsoup4
-lxml
-apscheduler
-python-dotenv
-pandas
