@@ -8,7 +8,6 @@ def main():
 
 if not matches:
     send_to_channel("❌ BUGÜN MAÇ VERİSİ YOK (API boş döndü)")
-    return
 
     tickets = build_ticket(matches)
 
