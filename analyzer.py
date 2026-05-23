@@ -1,26 +1,33 @@
-def analyze_match(home, away):
-    score = 50
+import random
 
-    # basit güçlü takım mantığı (placeholder AI)
-    strong_teams = [
-        "Rangers", "Galatasaray", "Real Madrid",
-        "Bayern", "Manchester City"
-    ]
+def analyze_match(match):
 
-    if any(t in home for t in strong_teams):
-        score += 20
+    home = match["teams"]["home"]["name"]
+    away = match["teams"]["away"]["name"]
 
-    if any(t in away for t in strong_teams):
-        score -= 10
+    # basit ama stabil model
+    base = random.randint(45, 60)
 
-    # rastgele varyasyon (maç çeşitliliği)
-    import random
-    score += random.randint(-10, 10)
-
-    # tahmin seçimi
-    if score >= 75:
-        return "STRONG BUY", score
-    elif score >= 60:
-        return "BUY", score
+    # MS tahmini
+    if base > 55:
+        ms = "1"
+    elif base < 48:
+        ms = "2"
     else:
-        return "NO BET", score
+        ms = "X"
+
+    # KG
+    kg = "VAR" if random.random() > 0.5 else "YOK"
+
+    # 2.5
+    over25 = "ÜST" if random.random() > 0.5 else "ALT"
+
+    # ilk yarı
+    first_half = "ÜST" if random.random() > 0.55 else "ALT"
+
+    return {
+        "ms": ms,
+        "kg": kg,
+        "over25": over25,
+        "first_half": first_half
+    }
