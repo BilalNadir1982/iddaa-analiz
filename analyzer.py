@@ -2,32 +2,19 @@ import random
 
 def analyze_match(match):
 
-    base = random.randint(45, 65)
+    prob = random.randint(55, 85)
+    value = prob - random.randint(40, 65)
 
-    # MS
-    if base > 58:
-        ms = "1"
-    elif base < 50:
-        ms = "2"
-    else:
-        ms = "X"
-
-    # KG
-    kg = "VAR" if random.random() > 0.5 else "YOK"
-
-    # 2.5
-    over25 = "ÜST" if random.random() > 0.5 else "ALT"
-
-    # İY
-    first_half = "ÜST" if random.random() > 0.55 else "ALT"
-
-    # güven skoru (kupon filtresi)
-    confidence = base + random.randint(-5, 5)
+    ms = "1" if prob > 65 else "X" if prob > 55 else "2"
+    kg = "VAR" if prob > 60 else "YOK"
+    over25 = "ÜST" if prob > 62 else "ALT"
+    iy = "ÜST" if prob > 60 else "ALT"
 
     return {
         "ms": ms,
         "kg": kg,
         "over25": over25,
-        "first_half": first_half,
-        "confidence": confidence
+        "iy": iy,
+        "prob": prob,
+        "value": value
     }
