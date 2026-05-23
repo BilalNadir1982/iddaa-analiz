@@ -1,13 +1,20 @@
 import requests
+import os
+from datetime import date
 
-API_KEY = "YOUR_API_KEY"
-BASE_URL = "https://v3.football.api-sports.io"
+API_KEY = os.getenv("FOOTBALL_API_KEY")
 
 headers = {
     "x-apisports-key": API_KEY
 }
 
-def get_todays_matches():
-    url = f"{BASE_URL}/fixtures?date=2026-05-22"
+def get_matches():
+    today = str(date.today())
+
+    url = f"https://v3.football.api-sports.io/fixtures?date={today}"
+
     response = requests.get(url, headers=headers)
-    return response.json()
+
+    data = response.json()
+
+    return data["response"]
