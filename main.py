@@ -6,8 +6,9 @@ def main():
 
     matches = get_matches()
 
-if not matches:
-    send_to_channel("❌ BUGÜN MAÇ VERİSİ YOK (API boş döndü)")
+    if not matches:
+        send_to_channel("❌ BUGÜN MAÇ VERİSİ YOK (API boş döndü)")
+        return  # burada çıkmak mantıklı
 
     tickets = build_ticket(matches)
 
