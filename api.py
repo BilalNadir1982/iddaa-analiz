@@ -13,8 +13,8 @@ def get_matches():
 
     url = f"https://v3.football.api-sports.io/fixtures?date={today}"
 
-    response = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers)
 
-    data = response.json()
+    data = r.json()
 
     return data["response"]
