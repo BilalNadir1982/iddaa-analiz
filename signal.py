@@ -9,16 +9,29 @@ def build_ticket(matches):
 
     for m in matches:
 
-        a = analyze_match(m)
+        # ⚠️ API güvenlik kontrolü
+        if not isinstance(m, dict):
+            continue
 
-        home = m["teams"]["home"]["name"]
-        away = m["teams"]["away"]["name"]
+        if "home_team" in m:
+            home = m["home_team"]
+            away = m["away_team"]
+        else:
+            # Odds API farklı format fallback
+            try:
+                home = m["home_team"]["name"]
+                away = m["away_team"]["name"]
+            except:
+                continue
+
+        a = analyze_match(m)
 
         if a["prob"] < 70:
             continue
 
         text = f"""
 ⚽ {home} - {away}
+
 📊 MS: {a['ms']}
 ⚽ KG: {a['kg']}
 📈 2.5: {a['over25']}
