@@ -1,15 +1,33 @@
-import requests
-import os
+import random
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
+def analyze_match(match):
 
-def send_to_channel(msg):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    home = match["teams"]["home"]["name"]
+    away = match["teams"]["away"]["name"]
 
-    r = requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": msg
-    })
+    # basit ama stabil model
+    base = random.randint(45, 60)
 
-    print("TELEGRAM RESPONSE:", r.text)
+    # MS tahmini
+    if base > 55:
+        ms = "1"
+    elif base < 48:
+        ms = "2"
+    else:
+        ms = "X"
+
+    # KG
+    kg = "VAR" if random.random() > 0.5 else "YOK"
+
+    # 2.5
+    over25 = "ÜST" if random.random() > 0.5 else "ALT"
+
+    # ilk yarı
+    first_half = "ÜST" if random.random() > 0.55 else "ALT"
+
+    return {
+        "ms": ms,
+        "kg": kg,
+        "over25": over25,
+        "first_half": first_half
+    }
