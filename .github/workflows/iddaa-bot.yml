@@ -11,23 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repoyu İndir
+      - name: Repo indir
         uses: actions/checkout@v4
 
-      - name: Python 3.11 Kurulumu
+      - name: Python kur
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Bağımlılıkları Yükle
+      - name: Kurulum
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Botu Çalıştır
+      - name: Bot çalıştır
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
-
         run: python main.py
