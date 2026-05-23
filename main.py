@@ -1,46 +1,21 @@
-from api import get_matches
-from analyzer import analyze_match
+from api import get_odds
+from signal import build_ticket
 from sender import send_to_channel
 
-def format_match(match, a):
-    home = match["teams"]["home"]["name"]
-    away = match["teams"]["away"]["name"]
-
-    return f"""
-⚽ {home} - {away}
-
-📊 MS: {a['ms']}
-⚽ KG: {a['kg']}
-📈 2.5: {a['over25']}
-🕐 İY 0.5: {a['first_half']}
-📊 Güven: %{a['confidence']}
-"""
-
 def main():
-    matches = get_matches()
 
-    kupon = []
-    kupon_conf = 0
+    matches = get_odds()
 
-    for match in matches:
+    tickets = build_ticket(matches)
 
-        a = analyze_match(match)
+    send_to_channel("🔥 GENEL VALUE KUPON 🔥\n\n" + "\n".join(tickets["all"]))
 
-        # 🔥 filtre: sadece güçlü maçlar
-        if a["confidence"] >= 60:
-            kupon.append(format_match(match, a))
-            kupon_conf += a["confidence"]
+    send_to_channel("💣 BANKO KUPON 🔥\n\n" + "\n".join(tickets["banko"]))
 
-        if len(kupon) >= 3:
-            break
+    send_to_channel("🕐 İY MS KUPONU 🔥\n\n" + "\n".join(tickets["iy"]))
 
-    # kupon mesajı
-    msg = "🔥 GÜNÜN KUPONU 🔥\n\n"
-    msg += "\n".join(kupon)
+    send_to_channel("🎯 SKOR KUPONU 🔥\n\n" + "\n".join(tickets["skor"]))
 
-    msg += f"\n\n📊 Ortalama Güven: %{kupon_conf // len(kupon) if kupon else 0}"
-
-    send_to_channel(msg)
 
 if __name__ == "__main__":
     main()
