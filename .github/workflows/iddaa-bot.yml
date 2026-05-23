@@ -2,9 +2,9 @@ name: İddaa Bot - Günlük Analiz
 
 on:
   schedule:
-    - cron: '30 8 * * *'      # Her gün 08:30 Türkiye saati
-    - cron: '30 16 * * *'     # Her gün 16:30 Türkiye saati
-  workflow_dispatch:          # Manuel çalıştırmak için buton
+    - cron: '30 8 * * *'
+    - cron: '30 16 * * *'
+  workflow_dispatch:
 
 jobs:
   iddaa-analiz:
@@ -24,10 +24,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Environment Variables Oluştur
-        run: |
-          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
-          echo "CHANNEL_ID=${{ secrets.CHANNEL_ID }}" >> .env
+      - name: Botu Çalıştır
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
 
-      - name: Reset daily state
-  run: rm -f sent.txt
+        run: python main.py
