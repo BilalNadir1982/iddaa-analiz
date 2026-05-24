@@ -1,32 +1,27 @@
-name: İddaa Bot - Günlük Analiz
+name: IDDAA BOT
 
 on:
-  schedule:
-    - cron: '30 8 * * *'
-    - cron: '30 16 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
 
 jobs:
-  iddaa-analiz:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo indir
-        uses: actions/checkout@v4
+
+      - name: Repo cek
+        uses: actions/checkout@v3
 
       - name: Python kur
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Kurulum
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Kutuphaneler
+        run: pip install -r requirements.txt
 
-      - name: Bot çalıştır
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+      - name: Botu calistir
         run: python main.py
