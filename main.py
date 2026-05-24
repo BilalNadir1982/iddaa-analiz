@@ -1,29 +1,52 @@
+import time
+
 from api import get_matches
-from signal import build_ticket
-from sender import send_to_channel
+from analyzer import analyze_match
+from sender import send_message
+
+sent_matches = set()
 
 def main():
 
-    matches = get_matches()
+    send_message("🚀 IDDAA BOT AKTİF")
 
-    if not matches:
-        send_to_channel("❌ BUGÜN MAÇ VERİSİ YOK (API boş döndü)")
-        return  # burada çıkmak mantıklı
+    while True:
 
-    tickets = build_ticket(matches)
+        try:
 
-    if tickets["all"]:
-        send_to_channel("🔥 GENEL KUPON 🔥\n\n" + "\n".join(tickets["all"]))
+            matches = get_matches()
 
-    if tickets["banko"]:
-        send_to_channel("💣 BANKO KUPON 🔥\n\n" + "\n".join(tickets["banko"]))
+            print("ÇEKİLEN MAÇ:", len(matches))
 
-    if tickets["iy"]:
-        send_to_channel("🕐 İY MS KUPONU 🔥\n\n" + "\n".join(tickets["iy"]))
+            if len(matches) == 0:
+                print("MAÇ YOK")
 
-    if tickets["skor"]:
-        send_to_channel("🎯 SKOR KUPONU 🔥\n\n" + "\n".join(tickets["skor"]))
+            for match in matches:
 
+                fixture_id = match["fixture"]["id"]
+
+                if fixture_id in sent_matches:
+                    continue
+
+                result = analyze_match(match)
+
+                if result:
+
+                    send_message(result)
+
+                    sent_matches.add(fixture_id)
+
+                    time.sleep(3)
+
+            print("10 DK BEKLENİYOR")
+
+            time.sleep(600)
+
+        except Exception as e:
+
+            print("MAIN ERROR:", e)
+
+            time.sleep(30)
 
 if __name__ == "__main__":
     main()
