@@ -4,43 +4,113 @@ from api import get_matches
 from analyzer import analyze_match
 from sender import send_message
 
-send_message("TEST MESAJI")
+# =========================================
+# GÖNDERİLEN MAÇLAR
+# =========================================
 
 sent_matches = set()
 
+# =========================================
+# MAX MESAJ
+# =========================================
+
+MAX_MATCHES = 15
+
+# =========================================
+# ANA BOT
+# =========================================
+
 def main():
 
-    send_message("🚀 IDDAA BOT AKTİF")
+    send_message("🚀 PRO IDDAA ANALİZ BOT AKTİF")
 
     while True:
 
         try:
 
+            # =====================================
+            # MAÇLARI ÇEK
+            # =====================================
+
             matches = get_matches()
 
-            print("ÇEKİLEN MAÇ:", len(matches))
+            print(f"TOPLAM ÇEKİLEN MAÇ: {len(matches)}")
 
             if len(matches) == 0:
-                print("MAÇ YOK")
+
+                print("MAÇ BULUNAMADI")
+
+                time.sleep(60)
+
+                continue
+
+            # =====================================
+            # SAYAÇ
+            # =====================================
+
+            count = 0
+
+            # =====================================
+            # MAÇ DÖNGÜSÜ
+            # =====================================
 
             for match in matches:
 
-                fixture_id = match["fixture"]["id"]
+                try:
 
-                if fixture_id in sent_matches:
-                    continue
+                    # =================================
+                    # MAX MESAJ LİMİTİ
+                    # =================================
 
-                result = analyze_match(match)
+                    if count >= MAX_MATCHES:
+                        break
 
-                if result:
+                    fixture_id = match["fixture"]["id"]
 
-                    send_message(result)
+                    # =================================
+                    # AYNI MAÇI TEKRAR GÖNDERME
+                    # =================================
 
-                    sent_matches.add(fixture_id)
+                    if fixture_id in sent_matches:
+                        continue
 
-                    time.sleep(3)
+                    # =================================
+                    # ANALİZ
+                    # =================================
 
-            print("10 DK BEKLENİYOR")
+                    result = analyze_match(match)
+
+                    if result:
+
+                        send_message(result)
+
+                        print("MESAJ GÖNDERİLDİ")
+
+                        sent_matches.add(fixture_id)
+
+                        count += 1
+
+                        time.sleep(3)
+
+                except Exception as e:
+
+                    print("MATCH ERROR:", e)
+
+            # =====================================
+            # TEMİZLEME
+            # =====================================
+
+            if len(sent_matches) > 500:
+
+                sent_matches.clear()
+
+                print("SENT MATCHES TEMİZLENDİ")
+
+            # =====================================
+            # DÖNGÜ BEKLEME
+            # =====================================
+
+            print("10 DAKİKA BEKLENİYOR...")
 
             time.sleep(600)
 
@@ -49,6 +119,10 @@ def main():
             print("MAIN ERROR:", e)
 
             time.sleep(30)
+
+# =========================================
+# START
+# =========================================
 
 if __name__ == "__main__":
     main()
