@@ -1,10 +1,19 @@
-import requests
+from telegram import Bot
 from config import BOT_TOKEN, CHAT_ID
 
-def send_to_channel(msg):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+bot = Bot(token=BOT_TOKEN)
 
-    requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": msg
-    })
+def send_message(text):
+
+    try:
+
+        bot.send_message(
+            chat_id=CHAT_ID,
+            text=text
+        )
+
+        print("MESAJ GÖNDERİLDİ")
+
+    except Exception as e:
+
+        print("TELEGRAM ERROR:", e)
