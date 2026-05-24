@@ -2,19 +2,77 @@ import random
 
 def analyze_match(match):
 
-    prob = random.randint(55, 85)
-    value = prob - random.randint(40, 65)
+    try:
 
-    ms = "1" if prob > 65 else "X" if prob > 55 else "2"
-    kg = "VAR" if prob > 60 else "YOK"
-    over25 = "ÜST" if prob > 62 else "ALT"
-    iy = "ÜST" if prob > 60 else "ALT"
+        home = match["teams"]["home"]["name"]
+        away = match["teams"]["away"]["name"]
 
-    return {
-        "ms": ms,
-        "kg": kg,
-        "over25": over25,
-        "iy": iy,
-        "prob": prob,
-        "value": value
-    }
+        league = match["league"]["name"]
+
+        status = match["fixture"]["status"]["short"]
+
+        allowed = [
+            "NS",
+            "1H",
+            "HT",
+            "2H",
+            "LIVE"
+        ]
+
+        if status not in allowed:
+            return None
+
+        score = 0
+
+        # =====================================
+        # CANLI BONUS
+        # =====================================
+
+        if status in ["1H", "2H", "LIVE"]:
+            score += 30
+
+        # =====================================
+        # GOL BONUS
+        # =====================================
+
+        goals_home = match["goals"]["home"]
+        goals_away = match["goals"]["away"]
+
+        if goals_home is not None and goals_away is not None:
+
+            total = goals_home + goals_away
+
+            if total >= 2:
+                score += 25
+
+        # =====================================
+        # TAHMİN
+        # =====================================
+
+        if score >= 40:
+            prediction = "ÜST 2.5"
+            emoji = "🔥"
+
+        else:
+            prediction = "KG VAR"
+            emoji = "⚽"
+
+        return f"""
+{emoji} MAÇ ANALİZİ
+
+🏆 {league}
+
+⚔️ {home} vs {away}
+
+📊 Tahmin: {prediction}
+
+📈 Skor: {score}
+
+⏱ Durum: {status}
+"""
+
+    except Exception as e:
+
+        print("ANALYZER ERROR:", e)
+
+        return None
