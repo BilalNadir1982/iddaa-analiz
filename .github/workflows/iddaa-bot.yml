@@ -1,27 +1,27 @@
-name: IDDAA BOT
+name: iddaa-bot
 
 on:
+  push:
   workflow_dispatch:
-  schedule:
-    - cron: "*/10 * * * *"
 
 jobs:
-  build:
-
+  run:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
 
-      - name: Repo cek
-        uses: actions/checkout@v3
-
-      - name: Python kur
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: 3.10
 
-      - name: Kutuphaneler
+      - name: Install deps
         run: pip install -r requirements.txt
 
-      - name: Botu calistir
+      - name: Run bot
         run: python main.py
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          API_KEY: ${{ secrets.API_KEY }}
