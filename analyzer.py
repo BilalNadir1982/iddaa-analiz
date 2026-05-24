@@ -1,70 +1,101 @@
+IMPORTANT_LEAGUES = [
+
+    "Super Lig",
+    "Premier League",
+    "La Liga",
+    "Serie A",
+    "Bundesliga",
+    "Ligue 1",
+
+    "Champions League",
+    "Europa League",
+
+    "Eredivisie",
+    "Primeira Liga",
+
+    "Championship",
+
+    "Süper Lig"
+]
+
 def analyze_match(match):
 
     try:
 
+        league = match["league"]["name"]
+
+        # ====================================
+        # SADECE ÖNEMLİ LİGLER
+        # ====================================
+
+        if not any(x.lower() in league.lower() for x in IMPORTANT_LEAGUES):
+            return None
+
         home = match["teams"]["home"]["name"]
         away = match["teams"]["away"]["name"]
 
-        league = match["league"]["name"]
-
         status = match["fixture"]["status"]["short"]
 
-        allowed = [
-            "NS",
-            "1H",
-            "HT",
-            "2H",
-            "LIVE"
-        ]
+        goals_home = match["goals"]["home"] or 0
+        goals_away = match["goals"]["away"] or 0
 
-        if status not in allowed:
-            return None
+        total_goals = goals_home + goals_away
 
         score = 0
 
-        # =====================================
-        # CANLI BONUS
-        # =====================================
+        # ====================================
+        # CANLI MAÇ BONUS
+        # ====================================
 
-        if status in ["1H", "2H", "LIVE"]:
+        if status in ["1H", "HT", "2H", "LIVE"]:
+            score += 40
+
+        # ====================================
+        # GOL BONUS
+        # ====================================
+
+        if total_goals >= 1:
+            score += 20
+
+        if total_goals >= 2:
             score += 30
 
-        # =====================================
-        # GOL BONUS
-        # =====================================
+        if total_goals >= 3:
+            score += 40
 
-        goals_home = match["goals"]["home"]
-        goals_away = match["goals"]["away"]
-
-        if goals_home is not None and goals_away is not None:
-
-            total = goals_home + goals_away
-
-            if total >= 2:
-                score += 25
-
-        # =====================================
+        # ====================================
         # TAHMİN
-        # =====================================
+        # ====================================
 
-        if score >= 40:
+        prediction = None
+        emoji = "⚽"
+
+        if score >= 70:
             prediction = "ÜST 2.5"
             emoji = "🔥"
 
-        else:
+        elif score >= 50:
             prediction = "KG VAR"
-            emoji = "⚽"
+
+        else:
+            return None
+
+        # ====================================
+        # MESAJ
+        # ====================================
 
         return f"""
-{emoji} MAÇ ANALİZİ
+{emoji} CANLI MAÇ ANALİZİ
 
 🏆 {league}
 
 ⚔️ {home} vs {away}
 
+🥅 Skor: {goals_home} - {goals_away}
+
 📊 Tahmin: {prediction}
 
-📈 Skor: {score}
+📈 Güven Skoru: {score}
 
 ⏱ Durum: {status}
 """
