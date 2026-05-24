@@ -1,5 +1,3 @@
-import random
-
 def analyze_match(match):
 
     try:
