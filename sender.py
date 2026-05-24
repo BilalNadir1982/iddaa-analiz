@@ -1,5 +1,7 @@
 from telegram import Bot
-from config import BOT_TOKEN, CHAT_ID
+from config import BOT_TOKEN
+
+print("TOKEN:", BOT_TOKEN)
 
 bot = Bot(token=BOT_TOKEN)
 
