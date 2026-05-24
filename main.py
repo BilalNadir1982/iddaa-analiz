@@ -1,3 +1,6 @@
+from sender import send_panel
+send_message("🚀 PRO IDDAA ANALİZ BOT AKTİF")
+send_panel()
 import time
 
 from api import get_matches
