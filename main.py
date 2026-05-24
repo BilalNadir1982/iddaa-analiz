@@ -4,6 +4,8 @@ from api import get_matches
 from analyzer import analyze_match
 from sender import send_message
 
+send_message("TEST MESAJI")
+
 sent_matches = set()
 
 def main():
