@@ -1,107 +1,91 @@
-IMPORTANT_LEAGUES = [
+def calc_form(last5):
+    return sum(last5) / len(last5)
 
-    "Super Lig",
+
+ALLOWED_LEAGUES = {
     "Premier League",
+    "Championship",
     "La Liga",
-    "Serie A",
     "Bundesliga",
+    "Serie A",
     "Ligue 1",
-
-    "Champions League",
-    "Europa League",
-
+    "La Liga 2",
+    "Serie B",
+    "2. Bundesliga",
     "Eredivisie",
     "Primeira Liga",
+    "Süper Lig",
+    "1. Lig"
+}
 
-    "Championship",
-
-    "Süper Lig"
-]
 
 def analyze_match(match):
 
-    try:
+    league = match["league"]["name"]
 
-        league = match["league"]["name"]
-
-        # ====================================
-        # SADECE ÖNEMLİ LİGLER
-        # ====================================
-
-        if not any(x.lower() in league.lower() for x in IMPORTANT_LEAGUES):
-            return None
-
-        home = match["teams"]["home"]["name"]
-        away = match["teams"]["away"]["name"]
-
-        status = match["fixture"]["status"]["short"]
-
-        goals_home = match["goals"]["home"] or 0
-        goals_away = match["goals"]["away"] or 0
-
-        total_goals = goals_home + goals_away
-
-        score = 0
-
-        # ====================================
-        # CANLI MAÇ BONUS
-        # ====================================
-
-        if status in ["1H", "HT", "2H", "LIVE"]:
-            score += 40
-
-        # ====================================
-        # GOL BONUS
-        # ====================================
-
-        if total_goals >= 1:
-            score += 20
-
-        if total_goals >= 2:
-            score += 30
-
-        if total_goals >= 3:
-            score += 40
-
-        # ====================================
-        # TAHMİN
-        # ====================================
-
-        prediction = None
-        emoji = "⚽"
-
-        if score >= 70:
-            prediction = "ÜST 2.5"
-            emoji = "🔥"
-
-        elif score >= 50:
-            prediction = "KG VAR"
-
-        else:
-            return None
-
-        # ====================================
-        # MESAJ
-        # ====================================
-
-        return f"""
-{emoji} CANLI MAÇ ANALİZİ
-
-🏆 {league}
-
-⚔️ {home} vs {away}
-
-🥅 Skor: {goals_home} - {goals_away}
-
-📊 Tahmin: {prediction}
-
-📈 Güven Skoru: {score}
-
-⏱ Durum: {status}
-"""
-
-    except Exception as e:
-
-        print("ANALYZER ERROR:", e)
-
+    if league not in ALLOWED_LEAGUES:
         return None
+
+    home = match["teams"]["home"]["name"]
+    away = match["teams"]["away"]["name"]
+
+    # ---------------- demo stats (API bağlanınca gerçek olur)
+    home_form = 0.8
+    away_form = 0.6
+
+    home_attack = 1.7
+    away_attack = 1.2
+
+    home_def = 1.0
+    away_def = 1.3
+
+    # ---------------- gol modeli
+    home_exp = (home_attack + away_def) / 2
+    away_exp = (away_attack + home_def) / 2
+
+    total = home_exp + away_exp
+
+    # ---------------- MS
+    if home_form > away_form + 0.1:
+        ms = "MS1"
+    elif away_form > home_form + 0.1:
+        ms = "MS2"
+    else:
+        ms = "MSX"
+
+    # ---------------- KG
+    if home_exp > 1 and away_exp > 0.8:
+        kg = "KG VAR"
+    else:
+        kg = "KG YOK"
+
+    # ---------------- gol
+    if total >= 2.6:
+        goal = "2.5 ÜST"
+    else:
+        goal = "2.5 ALT"
+
+    # ---------------- confidence
+    confidence = int(60 + (home_form - away_form) * 50)
+    confidence = max(45, min(95, confidence))
+
+    if confidence >= 80:
+        risk = "🟢 BANKO"
+    elif confidence >= 60:
+        risk = "🟡 ORTA"
+    else:
+        risk = "🔴 RİSKLİ"
+
+    return f"""
+⚽ MAÇ ANALİZİ
+
+🏆 {home} vs {away}
+🏆 Lig: {league}
+
+🎯 MS: {ms}
+🎯 KG: {kg}
+🎯 Gol: {goal}
+
+📊 Güven: %{confidence}
+📌 Seviye: {risk}
+"""
