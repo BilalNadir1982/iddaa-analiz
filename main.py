@@ -1,19 +1,29 @@
 import time
 
+from telegram.ext import Updater, CallbackQueryHandler
+
 from api import get_matches
 from analyzer import analyze_match
 from sender import send_message, send_panel
+from panel import handle_buttons
 
 sent_matches = set()
-
-MAX_MATCHES = 15
 
 
 def main():
 
-    # 🔥 BURASI ÖNEMLİ
-    send_message("🚀 PRO IDDAA BOT AKTİF")
+    send_message("🚀 PRO BOT AKTİF")
+
     send_panel()
+
+    updater = Updater("TELEGRAM_BOT_TOKEN", use_context=True)
+
+    dp = updater.dispatcher
+
+    # 🔥 BUTONLAR AKTİF
+    dp.add_handler(CallbackQueryHandler(handle_buttons))
+
+    updater.start_polling()
 
     while True:
 
@@ -21,43 +31,34 @@ def main():
 
             matches = get_matches()
 
-            print(f"TOPLAM MAÇ: {len(matches)}")
-
             count = 0
 
-            for match in matches:
+            for m in matches:
 
-                if count >= MAX_MATCHES:
+                if count >= 15:
                     break
 
-                fixture_id = match["fixture"]["id"]
+                mid = m["fixture"]["id"]
 
-                if fixture_id in sent_matches:
+                if mid in sent_matches:
                     continue
 
-                result = analyze_match(match)
+                result = analyze_match(m)
 
                 if result:
 
                     send_message(result)
 
-                    sent_matches.add(fixture_id)
+                    sent_matches.add(mid)
 
                     count += 1
 
                     time.sleep(3)
 
-            if len(sent_matches) > 500:
-                sent_matches.clear()
-
-            print("10 DK BEKLEME")
-
             time.sleep(600)
 
         except Exception as e:
-
-            print("MAIN ERROR:", e)
-
+            print(e)
             time.sleep(30)
 
 
