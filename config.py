@@ -1,5 +1,7 @@
-import os
+API_KEY = "API_FOOTBALL_KEY"
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
-ODDS_API_KEY = os.getenv("ODDS_API_KEY")
+BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
+
+CHAT_ID = "CHAT_ID"
+
+TIMEZONE = "Europe/Istanbul"
