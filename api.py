@@ -1,30 +1,63 @@
 import requests
-from config import ODDS_API_KEY
+from datetime import datetime
+import pytz
+
+from config import API_KEY, TIMEZONE
+
+HEADERS = {
+    "x-apisports-key": API_KEY
+}
+
+BASE_URL = "https://v3.football.api-sports.io"
+
+# =========================================
+# BUGÜNÜN MAÇLARI
+# =========================================
 
 def get_matches():
 
-    url = "https://api.the-odds-api.com/v4/sports/soccer/odds"
+    try:
 
-    params = {
-        "apiKey": ODDS_API_KEY,
-        "regions": "eu",
-        "markets": "h2h,totals",
-        "oddsFormat": "decimal"
-    }
+        turkey = pytz.timezone(TIMEZONE)
 
-    r = requests.get(url, params=params)
+        today = datetime.now(turkey).strftime("%Y-%m-%d")
 
-    data = r.json()
+        url = f"{BASE_URL}/fixtures"
 
-    # 🔥 DEBUG
-    print("API RESPONSE TYPE:", type(data))
-    print("API LENGTH:", len(data) if isinstance(data, list) else "NO LIST")
+        params = {
+            "date": today,
+            "timezone": TIMEZONE
+        }
 
-    # güvenli dönüş
-    if not data:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            params=params,
+            timeout=30
+        )
+
+        print("STATUS:", response.status_code)
+
+        data = response.json()
+
+        print("API RESPONSE:", data)
+
+        # =====================================
+        # RESPONSE YOKSA
+        # =====================================
+
+        if "response" not in data:
+            print("RESPONSE YOK")
+            return []
+
+        matches = data["response"]
+
+        print("TOPLAM MAÇ:", len(matches))
+
+        return matches
+
+    except Exception as e:
+
+        print("API ERROR:", e)
+
         return []
-
-    if isinstance(data, list):
-        return data
-
-    return data.get("data", [])
