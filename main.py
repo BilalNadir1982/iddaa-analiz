@@ -1,38 +1,60 @@
 import time
 from api import get_matches
 from analyzer import analyze_match
-from sender import send_message
+from sender import send_telegram
 
-sent = set()
+send_telegram("🚀 İDDIA PRO BOT AKTİF")
 
-def main():
+while True:
 
-    send_message("🚀 İDDIA PRO BOT AKTİF")
+    try:
 
-    while True:
+        matches = get_matches()
 
-        try:
-            matches = get_matches()
+        print(matches)
 
-            for m in matches:
+        if not matches:
+            send_telegram("⚠️ AKTİF MAÇ BULUNAMADI")
+            time.sleep(300)
+            continue
 
-                mid = m["fixture"]["id"]
+        for match in matches:
 
-                if mid in sent:
-                    continue
+            analysis = analyze_match(match)
 
-                result = analyze_match(m)
+            if analysis is None:
+                continue
 
-                if result:
-                    send_message(result)
-                    sent.add(mid)
+            msg = f"""
+🔥 CANLI MAÇ ANALİZİ
 
-            time.sleep(600)
+🏠 {match['home']}
+🆚
+🚩 {match['away']}
 
-        except Exception as e:
-            print("ERROR:", e)
-            time.sleep(30)
+⚽ SKOR:
+{match['home_goals']} - {match['away_goals']}
 
+📊 ANALİZ:
+{analysis['prediction']}
 
-if __name__ == "__main__":
-    main()
+🎯 GÜVEN:
+%{analysis['confidence']}
+
+💎 MARKET:
+{analysis['market']}
+"""
+
+            send_telegram(msg)
+
+            time.sleep(5)
+
+        time.sleep(300)
+
+    except Exception as e:
+
+        print(e)
+
+        send_telegram(f"❌ HATA: {e}")
+
+        time.sleep(60)
