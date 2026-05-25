@@ -1,8 +1,3 @@
-# =========================================
-# analyzer.py
-# PRO AI BETTING ENGINE
-# =========================================
-
 import random
 
 FAVORITE_LEAGUES = [
@@ -29,73 +24,103 @@ def analyze_match(match):
 
     total = hg + ag
 
-    confidence = 50
-    market = "NO BET"
-    prediction = "Riskli"
+    # =================================
+    # BASE AI SCORE
+    # =================================
 
-    # ===================================
+    confidence = random.randint(55, 75)
+
+    market = "NO BET"
+    prediction = "Temkinli"
+
+    # =================================
     # FAVORI LIG BONUS
-    # ===================================
+    # =================================
 
     if league in FAVORITE_LEAGUES:
         confidence += 10
 
-    # ===================================
-    # OVER ANALIZ
-    # ===================================
+    # =================================
+    # GOL ANALIZ
+    # =================================
 
-    if total >= 2 and minute < 70:
+    if total >= 1:
+        confidence += 8
 
-        market = "OVER 2.5"
-        prediction = "2.5 ÜST güçlü ihtimal"
-        confidence += 25
+    if total >= 2:
+        confidence += 12
 
-    # ===================================
+    # =================================
     # KG VAR
-    # ===================================
+    # =================================
 
     if hg > 0 and ag > 0:
 
         market = "BTTS"
-        prediction = "KG VAR güçlü ihtimal"
-        confidence += 20
 
-    # ===================================
-    # ILK YARI ANALIZ
-    # ===================================
-
-    if minute < 35 and total >= 1:
+        prediction = "KG VAR güçlü"
 
         confidence += 15
 
-    # ===================================
-    # BANKO FILTRE
-    # ===================================
+    # =================================
+    # OVER ANALIZ
+    # =================================
 
-    if confidence >= 85:
+    elif total >= 2:
 
-        coupon = True
+        market = "OVER 2.5"
+
+        prediction = "2.5 ÜST güçlü"
+
+        confidence += 18
+
+    # =================================
+    # ILK YARI GOL
+    # =================================
+
+    elif minute < 35 and total >= 1:
+
+        market = "İY 0.5 ÜST"
+
+        prediction = "İlk yarı gol uygun"
+
+        confidence += 15
 
     else:
 
-        coupon = False
+        market = "UNDER 3.5"
 
-    # ===================================
-    # AI SKOR TAHMIN
-    # ===================================
+        prediction = "Düşük risk"
 
-    predicted_home = random.randint(1, 3)
-    predicted_away = random.randint(0, 2)
+        confidence += 5
 
-    score_prediction = f"{predicted_home}-{predicted_away}"
+    # =================================
+    # LIMIT
+    # =================================
+
+    if confidence > 99:
+        confidence = 99
+
+    # =================================
+    # BANKO FILTRE
+    # =================================
+
+    coupon = confidence >= 75
+
+    # =================================
+    # AI SCORE PREDICTION
+    # =================================
+
+    ph = random.randint(1, 3)
+    pa = random.randint(0, 2)
 
     return {
         "home": home,
         "away": away,
         "league": league,
-        "prediction": prediction,
         "market": market,
+        "prediction": prediction,
         "confidence": confidence,
         "coupon": coupon,
-        "score_prediction": score_prediction
+        "score_prediction": f"{ph}-{pa}"
     }
