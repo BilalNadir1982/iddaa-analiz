@@ -1,9 +1,16 @@
+# =========================================
+# api.py
+# =========================================
+
 import requests
+from datetime import datetime
 from config import API_KEY
 
 def get_matches():
 
-    url = "https://v3.football.api-sports.io/fixtures?live=all"
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    url = f"https://v3.football.api-sports.io/fixtures?date={today}"
 
     headers = {
         "x-apisports-key": API_KEY
@@ -13,8 +20,6 @@ def get_matches():
 
     data = response.json()
 
-    print(data)
-
     matches = []
 
     if "response" not in data:
@@ -22,14 +27,23 @@ def get_matches():
 
     for m in data["response"]:
 
-        match = {
-            "home": m["teams"]["home"]["name"],
-            "away": m["teams"]["away"]["name"],
-            "home_goals": m["goals"]["home"] or 0,
-            "away_goals": m["goals"]["away"] or 0,
-            "minute": m["fixture"]["status"]["elapsed"] or 0
-        }
+        try:
 
-        matches.append(match)
+            matches.append({
+
+                "home": m["teams"]["home"]["name"],
+                "away": m["teams"]["away"]["name"],
+
+                "home_goals": m["goals"]["home"] or 0,
+                "away_goals": m["goals"]["away"] or 0,
+
+                "minute": m["fixture"]["status"]["elapsed"] or 0,
+
+                "league": m["league"]["name"]
+
+            })
+
+        except:
+            pass
 
     return matches
