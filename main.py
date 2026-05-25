@@ -1,9 +1,13 @@
+# =========================================
+# main.py
+# =========================================
+
 import time
 from api import get_matches
 from analyzer import analyze_match
 from sender import send_telegram
 
-send_telegram("🚀 İDDIA PRO BOT AKTİF")
+send_telegram("🚀 PRO İDDIA AI ENGINE AKTİF")
 
 while True:
 
@@ -11,50 +15,80 @@ while True:
 
         matches = get_matches()
 
-        print(matches)
-
-        if not matches:
-            send_telegram("⚠️ AKTİF MAÇ BULUNAMADI")
-            time.sleep(300)
-            continue
+        coupons = []
 
         for match in matches:
 
             analysis = analyze_match(match)
 
-            if analysis is None:
-                continue
+            if analysis["coupon"]:
 
-            msg = f"""
-🔥 CANLI MAÇ ANALİZİ
+                coupons.append(analysis)
 
-🏠 {match['home']}
+                msg = f"""
+🔥 BANKO MAÇ
+
+🏆 Lig:
+{analysis['league']}
+
+🏠 {analysis['home']}
 🆚
-🚩 {match['away']}
+🚩 {analysis['away']}
 
-⚽ SKOR:
-{match['home_goals']} - {match['away_goals']}
+📊 Market:
+{analysis['market']}
 
-📊 ANALİZ:
+🧠 AI Analiz:
 {analysis['prediction']}
 
-🎯 GÜVEN:
+🎯 Güven:
 %{analysis['confidence']}
 
-💎 MARKET:
-{analysis['market']}
+⚽ AI Skor Tahmini:
+{analysis['score_prediction']}
 """
 
-            send_telegram(msg)
+                send_telegram(msg)
 
-            time.sleep(5)
+                time.sleep(3)
 
-        time.sleep(300)
+        # =================================
+        # OTOMATIK 3'LU KUPON
+        # =================================
+
+        if len(coupons) >= 3:
+
+            c1 = coupons[0]
+            c2 = coupons[1]
+            c3 = coupons[2]
+
+            coupon_msg = f"""
+💎 OTOMATIK 3'LÜ KUPON
+
+1️⃣ {c1['home']} vs {c1['away']}
+➡️ {c1['market']}
+
+2️⃣ {c2['home']} vs {c2['away']}
+➡️ {c2['market']}
+
+3️⃣ {c3['home']} vs {c3['away']}
+➡️ {c3['market']}
+
+🔥 AI GÜVENLİ KUPON
+"""
+
+            send_telegram(coupon_msg)
+
+        else:
+
+            send_telegram("⚠️ Yeterli BANKO maç bulunamadı")
+
+        time.sleep(600)
 
     except Exception as e:
 
-        print(e)
-
         send_telegram(f"❌ HATA: {e}")
+
+        print(e)
 
         time.sleep(60)
