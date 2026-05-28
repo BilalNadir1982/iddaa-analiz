@@ -2,37 +2,42 @@ name: Iddaa Analiz Bot Otomasyonu
 
 on:
   schedule:
-    # UTC saatine göre ayarlanmıştır. UTC 06:00, Türkiye saatiyle (TSİ) 09:00'a denk gelir.
+    # 1. Tetikleyici (UTC 06:00 -> TSİ 09:00 Sabah Kuponu)
     - cron: '0 6 * * *'
-  workflow_dispatch:
-    # Bu seçenek, GitHub sitesi üzerinden "Run workflow" diyerek botu elle de çalıştırmanı sağlar.
+    # 2. Tetikleyici (UTC 20:30 -> TSİ 23:30 Gece Raporu)
+    - cron: '30 20 * * *'
+  workflow_dispatch: # Manuel çalıştırma butonu
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Adım: GitHub deposundaki kodları Runner içerisine çekiyoruz
       - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      # 2. Adım: Sistemde Python 3.11 ortamı kuruyoruz
       - name: Python Ortamını Kur
         uses: actions/setup-python@v5
         with:
-          python-python: '3.11'
-          cache: 'pip' # Bağımlılıkların hızlı yüklenmesi için önbellekleme
+          python-version: '3.11'
 
-      # 3. Adım: Gerekli kütüphaneleri yüklüyoruz (python-telegram-bot, requests vb.)
       - name: Gerekli Kütüphaneleri Yükle
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # 4. Adım: Ana scripti (main.py) çalıştırıp Telegram'a mesaj gönderiyoruz
-      - name: Botu Tetikle ve Kuponu Gönder
+      # SAAT SABAH 09:00 İSE KUPONU PAYLAŞ
+      - name: Sabah Kuponunu Paylaş
+        if: github.event.schedule == '0 6 * * *' || github.event_name == 'workflow_dispatch'
         env:
-          # GitHub Secrets kısmına eklediğin değişkenleri bota güvenli bir şekilde aktarıyoruz
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
+
+      # SAAT GECE 23:30 İSE SONUÇLARI KONTROL ET
+      - name: Gece Sonuç Raporunu Paylaş
+        if: github.event.schedule == '30 20 * * *'
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python check_results.py
