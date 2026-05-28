@@ -7,9 +7,10 @@ HEADERS = {
     "x-apisports-key": API_KEY
 }
 
-def get_fixtures(league=39):
+# Premier League örnek (39)
+def get_fixtures(league=39, season=2024):
 
-    url = f"{BASE_URL}/fixtures?league={league}&season=2024"
+    url = f"{BASE_URL}/fixtures?league={league}&season={season}&next=20"
 
     r = requests.get(url, headers=HEADERS)
     data = r.json()
