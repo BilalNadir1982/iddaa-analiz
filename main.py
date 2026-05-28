@@ -6,16 +6,16 @@ from sender import send_coupon
 def main():
     print("Bot çalıştırıldı, analiz süreci başlıyor...")
     
-    # 1. Adım: Maçları çek
+    # 1. Adım: Maç verilerini havuzdan al
     raw_matches = fetch_daily_matches()
     
-    # 2. Adım: Algoritma ile analiz et ve filtrele
+    # 2. Adım: En güvenilir olanları filtrele
     analyzed_matches = analyze_matches(raw_matches)
     
-    # 3. Adım: Şık bir kupon formatı haline getir
+    # 3. Adım: Telegram mesaj formatına çevir
     coupon_text = format_coupon(analyzed_matches)
     
-    # 4. Adım: Telegram kanalına/grubuna gönder
+    # 4. Adım: Kanala gönder
     print("Kupon hazırlandı, Telegram'a gönderiliyor...")
     send_coupon(coupon_text)
     
