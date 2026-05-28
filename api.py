@@ -1,68 +1,37 @@
-from api import get_matches
-from analyzer import analyze_match
-from coupon import create_coupon
-from sender import send_coupon
+import requests
+from config import API_KEY
 
-# =========================================
+BASE_URL = "https://api.football-data.org/v4"
 
-# GET MATCHES
+HEADERS = {
+    "X-Auth-Token": API_KEY
+}
 
-# =========================================
+LEAGUES = ["PL", "SA", "BL1", "PD", "FL1", "CL"]
 
-matches = get_matches()
+def get_matches():
 
-analyzed = []
+    matches = []
 
-for m in matches:
+    for league in LEAGUES:
 
-```
-try:
+        url = f"{BASE_URL}/competitions/{league}/matches"
 
-    fake_match = {
+        try:
+            r = requests.get(url, headers=HEADERS)
+            data = r.json()
 
-        "home": {
-            "name": m["home"],
-            "wins_last5": 4,
-            "points_last5": 11,
-            "home_winrate": 75,
-            "goals_scored_avg": 2.1,
-            "first_half_goal_rate": 70,
-            "h2h_winrate": 65,
-            "missing_players": 1,
-            "motivation": "title",
-            "clean_sheet_rate": 55
-        },
+            for m in data.get("matches", []):
 
-        "away": {
-            "name": m["away"],
-            "wins_last5": 1,
-            "points_last5": 4,
-            "away_lossrate": 65,
-            "goals_scored_avg": 1.0,
-            "missing_players": 3
-        }
-    }
+                if m["status"] != "TIMED":
+                    continue
 
-    result = analyze_match(fake_match)
+                matches.append({
+                    "home": m["homeTeam"]["name"],
+                    "away": m["awayTeam"]["name"]
+                })
 
-    analyzed.append(result)
+        except:
+            pass
 
-except Exception as e:
-    print(e)
-```
-
-# =========================================
-
-# CREATE COUPON
-
-# =========================================
-
-coupon = create_coupon(analyzed)
-
-# =========================================
-
-# SEND
-
-# =========================================
-
-send_coupon(coupon)
+    return matches
