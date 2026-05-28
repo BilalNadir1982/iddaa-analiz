@@ -1,30 +1,38 @@
-name: IDDAA BOT
+name: Iddaa Analiz Bot Otomasyonu
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"
+    # UTC saatine göre ayarlanmıştır. UTC 06:00, Türkiye saatiyle (TSİ) 09:00'a denk gelir.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Bu seçenek, GitHub sitesi üzerinden "Run workflow" diyerek botu elle de çalıştırmanı sağlar.
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
-    env:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      CHAT_ID: ${{ secrets.CHAT_ID }}
-      API_KEY: ${{ secrets.API_KEY }}
-
     steps:
-      - name: Repo cek
+      # 1. Adım: GitHub deposundaki kodları Runner içerisine çekiyoruz
+      - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      - name: Python kur
+      # 2. Adım: Sistemde Python 3.11 ortamı kuruyoruz
+      - name: Python Ortamını Kur
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-python: '3.11'
+          cache: 'pip' # Bağımlılıkların hızlı yüklenmesi için önbellekleme
 
-      - name: Kutuphaneleri kur
-        run: pip install -r requirements.txt
+      # 3. Adım: Gerekli kütüphaneleri yüklüyoruz (python-telegram-bot, requests vb.)
+      - name: Gerekli Kütüphaneleri Yükle
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Botu calistir
+      # 4. Adım: Ana scripti (main.py) çalıştırıp Telegram'a mesaj gönderiyoruz
+      - name: Botu Tetikle ve Kuponu Gönder
+        env:
+          # GitHub Secrets kısmına eklediğin değişkenleri bota güvenli bir şekilde aktarıyoruz
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
