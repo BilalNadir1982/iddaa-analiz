@@ -1,94 +1,64 @@
-# =========================================
+```python
 # main.py
+
+from analyzer import analyze_match
+from coupon import create_coupon
+from sender import send_coupon
+
+# =========================================
+# SAMPLE DATA
+# API'DEN GELECEK
 # =========================================
 
-import time
-from api import get_matches
-from analyzer import analyze_match
-from sender import send_telegram
+matches_data = [
 
-send_telegram("🚀 PRO İDDIA AI ENGINE AKTİF")
+    {
+        "home": {
+            "name": "Galatasaray",
+            "wins_last5": 4,
+            "points_last5": 12,
+            "home_winrate": 80,
+            "goals_scored_avg": 2.3,
+            "first_half_goal_rate": 75,
+            "h2h_winrate": 70,
+            "missing_players": 0,
+            "motivation": "title",
+            "clean_sheet_rate": 60
+        },
 
-while True:
+        "away": {
+            "name": "Kasımpaşa",
+            "wins_last5": 1,
+            "points_last5": 4,
+            "away_lossrate": 65,
+            "goals_scored_avg": 1.1,
+            "missing_players": 3
+        }
+    }
 
-    try:
+]
 
-        matches = get_matches()
+# =========================================
+# ANALYZE
+# =========================================
 
-        coupons = []
+analyzed_matches = []
 
-        for match in matches:
+for match in matches_data:
 
-            analysis = analyze_match(match)
+    result = analyze_match(match)
 
-            if analysis["coupon"]:
+    analyzed_matches.append(result)
 
-                coupons.append(analysis)
+# =========================================
+# CREATE COUPON
+# =========================================
 
-                msg = f"""
-🔥 BANKO MAÇ
+coupon = create_coupon(analyzed_matches)
 
-🏆 Lig:
-{analysis['league']}
+# =========================================
+# SEND TELEGRAM
+# =========================================
 
-🏠 {analysis['home']}
-🆚
-🚩 {analysis['away']}
-
-📊 Market:
-{analysis['market']}
-
-🧠 AI Analiz:
-{analysis['prediction']}
-
-🎯 Güven:
-%{analysis['confidence']}
-
-⚽ AI Skor Tahmini:
-{analysis['score_prediction']}
-"""
-
-                send_telegram(msg)
-
-                time.sleep(3)
-
-        # =================================
-        # OTOMATIK 3'LU KUPON
-        # =================================
-
-        if len(coupons) >= 3:
-
-            c1 = coupons[0]
-            c2 = coupons[1]
-            c3 = coupons[2]
-
-            coupon_msg = f"""
-💎 OTOMATIK 3'LÜ KUPON
-
-1️⃣ {c1['home']} vs {c1['away']}
-➡️ {c1['market']}
-
-2️⃣ {c2['home']} vs {c2['away']}
-➡️ {c2['market']}
-
-3️⃣ {c3['home']} vs {c3['away']}
-➡️ {c3['market']}
-
-🔥 AI GÜVENLİ KUPON
-"""
-
-            send_telegram(coupon_msg)
-
-        else:
-
-            send_telegram("⚠️ Yeterli BANKO maç bulunamadı")
-
-        time.sleep(600)
-
-    except Exception as e:
-
-        send_telegram(f"❌ HATA: {e}")
-
-        print(e)
-
-        time.sleep(60)
+send_coupon(coupon)
+```
