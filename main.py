@@ -32,7 +32,6 @@ TAKIP_EDILEN_LIGLER = {
 # Gelişmiş Telegram Araçları (Buton Destekli)
 # ==========================================
 def send_telegram_with_buttons(text, inline_keyboard=None):
-    """Görkemli mesajları altındaki interaktif butonlarla birlikte kanala fırlatır."""
     if not BOT_TOKEN or not CHAT_ID: return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
@@ -101,7 +100,6 @@ def get_fallback_data():
 # AKTİF OTOMASYON MODÜLLERİ
 # ==========================================
 def run_morning_session(raw_matches):
-    """SABAH MODÜLÜ: Skor Tahminli VIP Kupon & Alt Menü Buton Köprüleri"""
     if not raw_matches: return
     
     kupon_maclari = []
@@ -119,7 +117,6 @@ def run_morning_session(raw_matches):
         if len(anket_secenekleri) < 3:
             anket_secenekleri.append(f"{match['home']} - {match['away']}")
 
-    # Görkemli VIP Şablonu
     msg = "💎 ═══  **VIP YAPAY ZEKA ANALİZİ** ═══ 💎\n"
     msg += "🔥 *İstatistik Analizleriyle Gecenin Gold Bülteni Hazır!*\n\n"
     
@@ -136,9 +133,12 @@ def run_morning_session(raw_matches):
         
     msg += "\n📊 **Yatırım Güven Endeksi:** `🟪🟪🟪🟪🟪🟪🟪🟪⬜⬜ %85+`\n"
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
-    msg += "👇 **Maçların Detay Matrisleri İçin Yapay Zeka Botumuzu Başlatın:**"
+    
+    msg += "⚠️ **ÖNEMLİ NOT:** Aşağıdaki panelleri ilk kez kullanacaksanız, lütfen önce bota girip alttaki **[BAŞLAT / START]** butonuna bir kez tıklayın! Aksi takdirde hata alabilirsiniz.\n\n"
+    msg += "👇 **Maçların Detay Matrisleri İçin Seçim Yapın:**"
 
-    bot_username = "iddaanalizbotu"
+    # GÜNCELLENEN DOĞRU BOT ADI
+    bot_username = "iddaaanalizbotubot"
     
     inline_keyboard = [
         [InlineKeyboardButton("⏱️ İY / MS MATRIX PANELİ", url=f"https://t.me/{bot_username}?start=iyms")],
@@ -151,7 +151,6 @@ def run_morning_session(raw_matches):
         send_telegram_poll("🤖 Yapay zekanın çıkardığı maçlardan sizce hangisi gecenin en güvenli BANKOSU?", anket_secenekleri)
 
 def run_live_betting_session(raw_matches):
-    """AKŞAM MODÜLÜ: Canlı Kasa Katlama Sinyali"""
     if not raw_matches: return
     target = raw_matches[0]
     
@@ -161,13 +160,13 @@ def run_live_betting_session(raw_matches):
     msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
     msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
     
-    bot_username = "iddaanalizbotu"
+    # GÜNCELLENEN DOĞRU BOT ADI
+    bot_username = "iddaaanalizbotubot"
     inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=f"https://t.me/{bot_username}?start=grafik")]]
     
     send_telegram_with_buttons(msg, inline_keyboard)
 
 def run_weekly_report():
-    """PAZAR GECESİ MODÜLÜ: Şeffaf Başarı Raporu"""
     msg = "📊 ═══ **HAFTALIK YAPAY ZEKA BAŞARI RAPORU** ═══ 📊\n"
     msg += "📈 **HAFTALIK NET BAŞARI ORANI: `% 82.1`**\n"
     msg += "🔹 *Yapay zeka algoritması matematik kullanır, şansa yer bırakmaz.*"
