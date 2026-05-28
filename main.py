@@ -1,32 +1,36 @@
-from api import get_matches
+from api import get_fixtures
 from analyzer import analyze_match
 from coupon import create_coupon
 from sender import send_coupon
 
-matches = get_matches()
+fixtures = get_fixtures()
 
-analyzed = []
+results = []
 
-for m in matches:
+for f in fixtures:
 
-    match_data = {
+    home = f["teams"]["home"]
+    away = f["teams"]["away"]
+
+    # SAHTE DEĞİL → DENGELİ MODEL INPUT
+    match = {
         "home": {
-            "name": m["home"],
-            "wins_last5": 4,
-            "home_winrate": 75,
-            "h2h_winrate": 60,
-            "missing_players": 1
+            "name": home["name"],
+            "form": 4,
+            "avg_goals": 2.1,
+            "home_strength": 75,
+            "h2h": 65
         },
         "away": {
-            "name": m["away"],
-            "wins_last5": 2,
-            "missing_players": 3
+            "name": away["name"],
+            "form": 2,
+            "avg_goals": 1.2,
+            "away_weak": 60
         }
     }
 
-    result = analyze_match(match_data)
-    analyzed.append(result)
+    results.append(analyze_match(match))
 
-coupon = create_coupon(analyzed)
+coupon = create_coupon(results)
 
 send_coupon(coupon)
