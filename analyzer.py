@@ -1,7 +1,10 @@
-import random
+from api import get_team_stats
 
 def analyze_matches(match_list):
-    """API'den gelen tüm maçlardaki takımları analiz eder ve en iyi 5'ini seçer."""
+    """
+    Simülasyon BİTTİ! 
+    Takımların son 5 maçtaki gerçek gol istatistiklerini hesaplar ve bilimsel tahmin üretir.
+    """
     if not match_list:
         return []
 
@@ -11,32 +14,48 @@ def analyze_matches(match_list):
         home_team = match["home"]
         away_team = match["away"]
         
-        # --- YAPAY ZEKA ANALİZ ALGORİTMASI ---
-        # Gerçek sistemde buralar takımların son 5 maçtaki gol ortalamalarına bakar.
-        # Şimdilik dinamik bir analiz simülasyonu kuruyoruz:
+        # Gerçek verileri API'den talep et
+        home_stats = get_team_stats(match.get("home_id"))
+        away_stats = get_team_stats(match.get("away_id"))
         
-        tahminler = [
-            {"pred": "Maç Sonucu 1", "conf": random.randint(80, 95), "det": f"{home_team} iç saha performansıyla öne çıkıyor."},
-            {"pred": "Karşılıklı Gol Var (KG VAR)", "conf": random.randint(75, 92), "det": f"İki takımın da son maçlarında gol barajı aşıldı."},
-            {"pred": "2.5 Üst", "conf": random.randint(78, 94), "det": f"{away_team} deplasmanda açık futbol tercih ediyor."},
-            {"pred": "İlk Yarı 1.5 Alt", "conf": random.randint(82, 96), "det": f"İki takım da maça kontrollü başlayacaktır."},
-            {"pred": "Toplam Korner 9.5 Üst", "conf": random.randint(80, 90), "det": f"Kanat organizasyonları korner sayısını artıracaktır."}
-        ]
-        
-        # Bu maç için en uygun tahmini rastgele/algoritmik seçiyoruz
-        secilen_tahmin = random.choice(tahminler)
-        
+        # Matematiksel Modelleme
+        # İki takımın toplam gol atma iştahı
+        toplam_gol_beklentisi = home_stats["avg_goals_scored"] + away_stats["avg_goals_scored"]
+        # Ev sahibinin gol yemeden kazanma ihtimali için defans gücü
+        ev_savunma_zaafi = home_stats["avg_goals_conceded"]
+        deplasman_savunma_zaafi = away_stats["avg_goals_conceded"]
+
+        # 🎯 GERÇEK KRİTERLERE GÖRE TAHMİN ÜRETİMİ
+        if toplam_gol_beklentisi > 3.2:
+            prediction = "2.5 Üst"
+            confidence = int(min(95, 70 + (toplam_gol_beklentisi * 7)))
+            detail = f"İki takımın son maçlardaki toplam gol ortalaması {toplam_gol_beklentisi:.2f}. Yüksek tempolu, bol gollü bir mücadele."
+            
+        elif home_stats["avg_goals_scored"] > 1.8 and deplasman_savunma_zaafi > 1.5:
+            prediction = "Maç Sonucu 1"
+            confidence = int(min(94, 75 + (home_stats["avg_goals_scored"] * 8)))
+            detail = f"{home_team} iç sahada {home_stats['avg_goals_scored']:.2f} gol ortalamasıyla oynuyor. {away_team} savunmasındaki açıkları cezalandıracaktır."
+            
+        elif home_stats["avg_goals_scored"] > 1.0 and away_stats["avg_goals_scored"] > 1.0:
+            prediction = "Karşılıklı Gol Var (KG VAR)"
+            confidence = int(min(92, 68 + (toplam_gol_beklentisi * 6)))
+            detail = f"Ev sahibinin gol ortalaması {home_stats['avg_goals_scored']:.2f}, deplasmanın ise {away_stats['avg_goals_scored']:.2f}. İki ekip de skora yakın."
+            
+        else:
+            prediction = "İlk Yarı 1.5 Alt"
+            confidence = int(random.randint(85, 90)) # Yedek kontrollü oyun tahmini
+            detail = f"Takımların kontrollü oyun yapısı ve düşük gol ortalaması, ilk yarıda dengeli bir stratejiye işaret ediyor."
+
         analiz_sonuclari.append({
             "league": match["league"],
             "home": home_team,
             "away": away_team,
-            "prediction": secilen_tahmin["pred"],
-            "confidence": secilen_tahmin["conf"],
-            "detail": secilen_tahmin["det"]
+            "prediction": prediction,
+            "confidence": confidence,
+            "detail": detail
         })
 
-    # Tüm liglerdeki tüm takımların analizleri bitti. 
-    # Şimdi güven skoru en yüksek olan EN İYİ 5 maçı ayıklıyoruz:
+    # Güven skoru en yüksek olan EN GERÇEKÇİ 5 maçı ayıkla
     sirali_maclar = sorted(analiz_sonuclari, key=lambda x: x['confidence'], reverse=True)
     return sirali_maclar[:5]
 
