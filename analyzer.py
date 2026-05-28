@@ -6,21 +6,30 @@ def analyze_match(match):
     score = 50
     reasons = []
 
-    if home["wins_last5"] > away["wins_last5"]:
-        score += 10
+    # FORM
+    if home["form"] > away["form"]:
+        score += 12
         reasons.append("Form üstünlüğü")
 
-    if home["home_winrate"] > 70:
+    # GOL
+    if home["avg_goals"] > 2:
+        score += 10
+        reasons.append("Yüksek gol ortalaması")
+
+    # İÇ SAHA
+    if home["home_strength"] > 70:
         score += 10
         reasons.append("İç saha güçlü")
 
-    if away["missing_players"] >= 3:
+    # DEPLASMAN ZAYIF
+    if away["away_weak"] > 60:
         score += 8
-        reasons.append("Rakip eksik")
+        reasons.append("Deplasman zayıf")
 
-    if home["h2h_winrate"] > 60:
-        score += 8
-        reasons.append("H2H avantaj")
+    # H2H
+    if home["h2h"] > 60:
+        score += 10
+        reasons.append("H2H üstünlük")
 
     if score > 100:
         score = 100
@@ -30,7 +39,7 @@ def analyze_match(match):
     elif score >= 70:
         signal = "IDEAL"
     else:
-        signal = "RISKLI"
+        signal = "RISK"
 
     return {
         "home": home["name"],
