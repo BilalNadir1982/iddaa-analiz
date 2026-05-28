@@ -5,7 +5,6 @@ from datetime import datetime
 
 # ==========================================
 # GİRİŞ: TELEGRAM KLASİK SINIF SIMÜLASYONU
-# (Kodun yukarısında olmalı ki hata vermesin)
 # ==========================================
 class InlineKeyboardButton:
     def __init__(self, text, url):
@@ -37,7 +36,6 @@ def send_telegram_with_buttons(text, inline_keyboard=None):
     if not BOT_TOKEN or not CHAT_ID: return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
-    # Buton nesnelerini Telegram'ın anlayacağı sözlük formatına çeviriyoruz
     serialized_keyboard = []
     if inline_keyboard:
         for row in inline_keyboard:
@@ -140,18 +138,15 @@ def run_morning_session(raw_matches):
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
     msg += "👇 **Maçların Detay Matrisleri İçin Yapay Zeka Botumuzu Başlatın:**"
 
-    # ⚠️ Kendi bot kullanıcı adını buraya @ işareti olmadan yazmayı unutma!
-    bot_username = "iddaanalizbotu" 
+    bot_username = "iddaanalizbotu"
     
     inline_keyboard = [
         [InlineKeyboardButton("⏱️ İY / MS MATRIX PANELİ", url=f"https://t.me/{bot_username}?start=iyms")],
         [InlineKeyboardButton("⚽ TÜM GOL VE KG VAR ANALİZLERİ", url=f"https://t.me/{bot_username}?start=goller")]
     ]
     
-    # Kuponu butonlarla birlikte kanala fırlat
     send_telegram_with_buttons(msg, inline_keyboard)
     
-    # Anket fırlat
     if len(anket_secenekleri) >= 2:
         send_telegram_poll("🤖 Yapay zekanın çıkardığı maçlardan sizce hangisi gecenin en güvenli BANKOSU?", anket_secenekleri)
 
@@ -160,13 +155,13 @@ def run_live_betting_session(raw_matches):
     if not raw_matches: return
     target = raw_matches[0]
     
-    msg = "⚡ ═══  **CANLI KASA KATLAMA SİNYALİ**  ═══ ⚡\n"
+    msg = "⚡ ═══  **CANLI KASA KATLAMA SİNYALİ** ═══ ⚡\n"
     msg += f"⚽ **Maç:** {target['home']} - {target['away']} ({target['league']})\n"
     msg += "⏱️ **Dakika:** `60' - 65' Arası`\n"
     msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
     msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
     
-    bot_username = "iddaanalizbotu""
+    bot_username = "iddaanalizbotu"
     inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=f"https://t.me/{bot_username}?start=grafik")]]
     
     send_telegram_with_buttons(msg, inline_keyboard)
