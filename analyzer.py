@@ -1,126 +1,142 @@
-import random
+```python
+# analyzer.py
 
-FAVORITE_LEAGUES = [
-    "Super Lig",
-    "Premier League",
-    "La Liga",
-    "Serie A",
-    "Bundesliga",
-    "Ligue 1",
-    "Champions League"
-]
+from datetime import datetime
+
+# =========================================
+# AI MATCH ANALYZER ENGINE
+# =========================================
 
 def analyze_match(match):
 
     home = match["home"]
     away = match["away"]
 
-    hg = match["home_goals"]
-    ag = match["away_goals"]
+    score = 50
+    reasons = []
 
-    minute = match["minute"]
+    # =========================================
+    # FORM ANALIZI
+    # =========================================
 
-    league = match["league"]
+    if home["wins_last5"] > away["wins_last5"]:
+        score += 10
+        reasons.append("Ev sahibi daha formda")
 
-    total = hg + ag
+    if home["points_last5"] > away["points_last5"]:
+        score += 5
+        reasons.append("Son 5 maç puan üstünlüğü")
 
-    # =================================
-    # BASE AI SCORE
-    # =================================
+    # =========================================
+    # IC SAHA / DEPLASMAN
+    # =========================================
 
-    confidence = random.randint(55, 75)
+    if home["home_winrate"] >= 70:
+        score += 10
+        reasons.append("İç saha performansı güçlü")
 
-    market = "NO BET"
-    prediction = "Temkinli"
+    if away["away_lossrate"] >= 60:
+        score += 8
+        reasons.append("Rakip deplasmanda kötü")
 
-    # =================================
-    # FAVORI LIG BONUS
-    # =================================
+    # =========================================
+    # GOL ANALIZI
+    # =========================================
 
-    if league in FAVORITE_LEAGUES:
-        confidence += 10
+    avg_goals = (
+        home["goals_scored_avg"] +
+        away["goals_scored_avg"]
+    ) / 2
 
-    # =================================
-    # GOL ANALIZ
-    # =================================
+    if avg_goals >= 2.5:
+        score += 7
+        reasons.append("Gol ortalaması yüksek")
 
-    if total >= 1:
-        confidence += 8
+    # =========================================
+    # ILK YARI ANALIZI
+    # =========================================
 
-    if total >= 2:
-        confidence += 12
+    if home["first_half_goal_rate"] >= 70:
+        score += 5
+        reasons.append("İlk yarı etkili takım")
 
-    # =================================
-    # KG VAR
-    # =================================
+    # =========================================
+    # H2H ANALIZI
+    # =========================================
 
-    if hg > 0 and ag > 0:
+    if home["h2h_winrate"] >= 60:
+        score += 8
+        reasons.append("H2H üstünlüğü mevcut")
 
-        market = "BTTS"
+    # =========================================
+    # SAKAT / EKSİK
+    # =========================================
 
-        prediction = "KG VAR güçlü"
+    if away["missing_players"] >= 3:
+        score += 6
+        reasons.append("Rakip eksik kadro")
 
-        confidence += 15
+    # =========================================
+    # MOTIVASYON
+    # =========================================
 
-    # =================================
-    # OVER ANALIZ
-    # =================================
+    if home["motivation"] == "title":
+        score += 7
+        reasons.append("Şampiyonluk motivasyonu")
 
-    elif total >= 2:
+    if home["motivation"] == "europe":
+        score += 5
+        reasons.append("Avrupa hedefi")
 
-        market = "OVER 2.5"
+    # =========================================
+    # CLEAN SHEET
+    # =========================================
 
-        prediction = "2.5 ÜST güçlü"
+    if home["clean_sheet_rate"] >= 50:
+        score += 4
+        reasons.append("Defans formu iyi")
 
-        confidence += 18
+    # =========================================
+    # SONUC
+    # =========================================
 
-    # =================================
-    # ILK YARI GOL
-    # =================================
+    if score > 100:
+        score = 100
 
-    elif minute < 35 and total >= 1:
+    # =========================================
+    # MARKET SECIMI
+    # =========================================
 
-        market = "İY 0.5 ÜST"
+    prediction = "MS1"
 
-        prediction = "İlk yarı gol uygun"
+    if avg_goals >= 3:
+        prediction = "2.5 ÜST"
 
-        confidence += 15
+    if (
+        home["goals_scored_avg"] >= 1.5 and
+        away["goals_scored_avg"] >= 1.2
+    ):
+        prediction = "KG VAR"
+
+    # =========================================
+    # SIGNAL
+    # =========================================
+
+    if score >= 85:
+        signal = "BANKO"
+
+    elif score >= 70:
+        signal = "IDEAL"
 
     else:
-
-        market = "UNDER 3.5"
-
-        prediction = "Düşük risk"
-
-        confidence += 5
-
-    # =================================
-    # LIMIT
-    # =================================
-
-    if confidence > 99:
-        confidence = 99
-
-    # =================================
-    # BANKO FILTRE
-    # =================================
-
-    coupon = confidence >= 75
-
-    # =================================
-    # AI SCORE PREDICTION
-    # =================================
-
-    ph = random.randint(1, 3)
-    pa = random.randint(0, 2)
+        signal = "RISKLI"
 
     return {
-        "home": home,
-        "away": away,
-        "league": league,
-        "market": market,
+        "home": home["name"],
+        "away": away["name"],
+        "score": score,
+        "signal": signal,
         "prediction": prediction,
-        "confidence": confidence,
-        "coupon": coupon,
-        "score_prediction": f"{ph}-{pa}"
+        "reasons": reasons
     }
+```
