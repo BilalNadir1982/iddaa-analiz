@@ -26,18 +26,20 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # SAAT SABAH 09:00 İSE KUPONU PAYLAŞ
+      # SABAH KUPONUNU PAYLAŞ
       - name: Sabah Kuponunu Paylaş
         if: github.event.schedule == '0 6 * * *' || github.event_name == 'workflow_dispatch'
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }} # Bu satırı eklediğinden emin ol!
         run: python main.py
 
-      # SAAT GECE 23:30 İSE SONUÇLARI KONTROL ET
+      # GECE SONUÇ RAPORUNU PAYLAŞ
       - name: Gece Sonuç Raporunu Paylaş
         if: github.event.schedule == '30 20 * * *'
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }} # Buraya da ekliyoruz
         run: python check_results.py
