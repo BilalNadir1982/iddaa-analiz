@@ -166,7 +166,7 @@ def run_live_betting_session(raw_matches):
     msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
     msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
     
-    bot_username = "İDDAA ANALİZ BOT"
+    bot_username = "iddaanalizbotu""
     inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=f"https://t.me/{bot_username}?start=grafik")]]
     
     send_telegram_with_buttons(msg, inline_keyboard)
