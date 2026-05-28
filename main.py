@@ -4,6 +4,17 @@ import json
 from datetime import datetime
 
 # ==========================================
+# GİRİŞ: TELEGRAM KLASİK SINIF SIMÜLASYONU
+# (Kodun yukarısında olmalı ki hata vermesin)
+# ==========================================
+class InlineKeyboardButton:
+    def __init__(self, text, url):
+        self.text = text
+        self.url = url
+    def to_dict(self):
+        return {"text": self.text, "url": self.url}
+
+# ==========================================
 # 1. AYARLAR & YAPILANDIRMA
 # ==========================================
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -25,13 +36,21 @@ def send_telegram_with_buttons(text, inline_keyboard=None):
     """Görkemli mesajları altındaki interaktif butonlarla birlikte kanala fırlatır."""
     if not BOT_TOKEN or not CHAT_ID: return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    
+    # Buton nesnelerini Telegram'ın anlayacağı sözlük formatına çeviriyoruz
+    serialized_keyboard = []
+    if inline_keyboard:
+        for row in inline_keyboard:
+            serialized_row = [btn.to_dict() for btn in row]
+            serialized_keyboard.append(serialized_row)
+
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
         "parse_mode": "Markdown"
     }
     if inline_keyboard:
-        payload["reply_markup"] = json.dumps({"inline_keyboard": inline_keyboard})
+        payload["reply_markup"] = json.dumps({"inline_keyboard": serialized_keyboard})
         
     requests.post(url, json=payload)
 
@@ -121,9 +140,9 @@ def run_morning_session(raw_matches):
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
     msg += "👇 **Maçların Detay Matrisleri İçin Yapay Zeka Botumuzu Başlatın:**"
 
-    # [YENİ ETKİLEŞİM PANELİ] Kuponun altına üyeleri bota yönlendirecek görkemli butonlar ekliyoruz
-    # GitHub Actions limitine takılmamak için butonlar üyeleri botun özel mesaj kutusuna (Deep-Link) yönlendirir.
-    bot_username = "Buraya_Kendi_Bot_Kullanici_Adini_Yaz_Bot" # Örn: YapayZekaAnalizBot
+    # ⚠️ Kendi bot kullanıcı adını buraya @ işareti olmadan yazmayı unutma!
+    bot_username = "Buraya_Kendi_Bot_Kullanici_Adini_Yaz_Bot" 
+    
     inline_keyboard = [
         [InlineKeyboardButton("⏱️ İY / MS MATRIX PANELİ", url=f"https://t.me/{bot_username}?start=iyms")],
         [InlineKeyboardButton("⚽ TÜM GOL VE KG VAR ANALİZLERİ", url=f"https://t.me/{bot_username}?start=goller")]
@@ -147,7 +166,6 @@ def run_live_betting_session(raw_matches):
     msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
     msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
     
-    # Canlı maçın altına da anlık grafik butonu ekleyelim
     bot_username = "İDDAA ANALİZ BOT"
     inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=f"https://t.me/{bot_username}?start=grafik")]]
     
@@ -178,11 +196,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Geriye dönük uyumluluk adına InlineKeyboardButton sınıf simülasyonu
-class InlineKeyboardButton:
-    def __init__(self, text, url):
-        self.text = text
-        self.url = url
-    def to_dict(self):
-        return {"text": self.text, "url": self.url}
