@@ -1,5 +1,6 @@
-import os
+```python
+BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
+CHAT_ID = "CHAT_ID"
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
-API_KEY = os.getenv("API_KEY")
+API_KEY = "FOOTBALL_DATA_API_KEY"
+```
