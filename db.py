@@ -1,31 +1,17 @@
-import sqlite3
-from datetime import date
+import json
+import os
 
-DB_NAME = "bot.db"
+KUPON_DOSYASI = "son_kupon.json"
 
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS sent (
-            day TEXT PRIMARY KEY
-        )
-    """)
-    conn.commit()
-    conn.close()
+def son_kuponu_kaydet(secilen_maclar):
+    """Sabah paylaşılan kupon verilerini gece kontrol etmek için kaydeder."""
+    with open(KUPON_DOSYASI, "w", encoding="utf-8") as f:
+        json.dump(secilen_maclar, f, ensure_ascii=False, indent=4)
+    print("Son kupon gece kontrolü için hafızaya kaydedildi.")
 
-def already_sent():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    today = str(date.today())
-    c.execute("SELECT day FROM sent WHERE day=?", (today,))
-    result = c.fetchone()
-    conn.close()
-    return result is not None
-
-def mark_sent():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("INSERT OR REPLACE INTO sent (day) VALUES (?)", (str(date.today()),))
-    conn.commit()
-    conn.close()
+def son_kuponu_getir():
+    """Gece kontrol edilmek üzere hafızadaki kuponu okur."""
+    if os.path.exists(KUPON_DOSYASI):
+        with open(KUPON_DOSYASI, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
