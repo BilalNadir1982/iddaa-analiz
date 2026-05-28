@@ -1,52 +1,50 @@
+import requests
+import json
+from config import FOOTBALL_API_KEY, API_BASE_URL, TAKIP_EDILEN_LIGLER
+
 def fetch_daily_matches():
-    """
-    API'den maçları çeker. Hata durumunda veya bülten boşken 
-    botun çalışması için gerçekçi analiz verilerini döner.
-    """
-    try:
-        mock_matches = [
-            {
-                "league": "İspanya La Liga",
-                "home": "Real Madrid",
-                "away": "Villarreal",
-                "prediction": "MS 1 & 1.5 Üst",
-                "confidence": 88,
-                "detail": "Real Madrid evinde namağlup. Villarreal deplasmanda gollü oynuyor."
-            },
-            {
-                "league": "Almanya Bundesliga",
-                "home": "Bayern Münih",
-                "away": "Eintracht Frankfurt",
-                "prediction": "Toplam Korner 9.5 Üst",
-                "confidence": 85,
-                "detail": "İki takımın da kanat organizasyonları ve şut ortalamaları çok yüksek."
-            },
-            {
-                "league": "İtalya Serie A",
-                "home": "Inter",
-                "away": "Fiorentina",
-                "prediction": "İlk Yarı 1.5 Alt",
-                "confidence": 90,
-                "detail": "Inter ligin en az gol yiyen takımı. Fiorentina deplasmanda katı savunma yapıyor."
-            },
-            {
-                "league": "İngiltere Premier League",
-                "home": "Arsenal",
-                "away": "Aston Villa",
-                "prediction": "Karşılıklı Gol Var (KG VAR)",
-                "confidence": 84,
-                "detail": "Her iki takımın da son 5 maçtaki skor üretme oranı %100."
-            },
-            {
-                "league": "Portekiz Premier Lig",
-                "home": "Sporting Lizbon",
-                "away": "Braga",
-                "prediction": "Maç Sonucu 1",
-                "confidence": 87,
-                "detail": "Sporting evinde maç başına 3 gol ortalamasıyla lider durumda."
-            }
-        ]
-        return mock_matches
-    except Exception as e:
-        print(f"Veri çekilirken hata oluştu: {e}")
-        return []
+    """Belirlenen tüm liglerdeki güncel maçları ve takımları API'den çeker."""
+    if FOOTBALL_API_KEY == "BURAYA_API_KEY_GELECEK" or not FOOTBALL_API_KEY:
+        print("⚠️ Uyarı: API Key tanımlanmadığı için test verileri yükleniyor.")
+        return get_fallback_data() # Key yoksa sistem çökmesin diye eski mantık çalışır
+
+    headers = {"X-Auth-Token": FOOTBALL_API_KEY}
+    tum_maclar = []
+
+    # Tanımladığımız tüm ligleri tek tek dönerek o günkü maçları topluyoruz
+    for lig_kodu, lig_adi in TAKIP_EDILEN_LIGLER.items():
+        try:
+            # Sadece o ligin güncel fikstürünü ve maçlarını istiyoruz
+            url = f"{API_BASE_URL}competitions/{lig_kodu}/matches"
+            response = requests.get(url, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                matches = data.get("matches", [])
+                
+                for match in matches:
+                    # Sadece henüz oynanmamış (SCHEDULED) veya canlı (TIMED) maçları al
+                    if match.get("status") in ["SCHEDULED", "TIMED"]:
+                        tum_maclar.append({
+                            "league": lig_adi,
+                            "home": match["homeTeam"]["name"],
+                            "away": match["awayTeam"]["name"],
+                            "home_id": match["homeTeam"]["id"],
+                            "away_id": match["awayTeam"]["id"],
+                            "match_id": match["id"]
+                        })
+        except Exception as e:
+            print(f"{lig_adi} verisi çekilirken hata oluştu: {e}")
+            continue
+
+    return tum_maclar
+
+def get_fallback_data():
+    # API anahtarı henüz girilmediyse botun hata vermemesi için yedek havuz
+    return [
+        {"league": "Almanya Bundesliga", "home": "Bayern Münih", "away": "Eintracht Frankfurt"},
+        {"league": "İngiltere Premier Lig", "home": "Arsenal", "away": "Aston Villa"},
+        {"league": "Trendyol Süper Lig", "home": "Galatasaray", "away": "Beşiktaş"},
+        {"league": "Trendyol Süper Lig", "home": "Fenerbahçe", "away": "Trabzonspor"},
+        {"league": "İspanya La Liga", "home": "Real Madrid", "away": "Villarreal"}
+    ]
