@@ -1,68 +1,41 @@
-from api import get_matches
-from analyzer import analyze_match
-from coupon import create_coupon
-from sender import send_coupon
+def analyze_match(match):
 
-# =========================================
+    home = match["home"]
+    away = match["away"]
 
-# GET MATCHES
+    score = 50
+    reasons = []
 
-# =========================================
+    if home["wins_last5"] > away["wins_last5"]:
+        score += 10
+        reasons.append("Form üstünlüğü")
 
-matches = get_matches()
+    if home["home_winrate"] > 70:
+        score += 10
+        reasons.append("İç saha güçlü")
 
-analyzed = []
+    if away["missing_players"] >= 3:
+        score += 8
+        reasons.append("Rakip eksik")
 
-for m in matches:
+    if home["h2h_winrate"] > 60:
+        score += 8
+        reasons.append("H2H avantaj")
 
-```
-try:
+    if score > 100:
+        score = 100
 
-    fake_match = {
+    if score >= 85:
+        signal = "BANKO"
+    elif score >= 70:
+        signal = "IDEAL"
+    else:
+        signal = "RISKLI"
 
-        "home": {
-            "name": m["home"],
-            "wins_last5": 4,
-            "points_last5": 11,
-            "home_winrate": 75,
-            "goals_scored_avg": 2.1,
-            "first_half_goal_rate": 70,
-            "h2h_winrate": 65,
-            "missing_players": 1,
-            "motivation": "title",
-            "clean_sheet_rate": 55
-        },
-
-        "away": {
-            "name": m["away"],
-            "wins_last5": 1,
-            "points_last5": 4,
-            "away_lossrate": 65,
-            "goals_scored_avg": 1.0,
-            "missing_players": 3
-        }
+    return {
+        "home": home["name"],
+        "away": away["name"],
+        "score": score,
+        "signal": signal,
+        "reasons": reasons
     }
-
-    result = analyze_match(fake_match)
-
-    analyzed.append(result)
-
-except Exception as e:
-    print(e)
-```
-
-# =========================================
-
-# CREATE COUPON
-
-# =========================================
-
-coupon = create_coupon(analyzed)
-
-# =========================================
-
-# SEND
-
-# =========================================
-
-send_coupon(coupon)
