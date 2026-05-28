@@ -1,44 +1,68 @@
-```python
-# sender.py
-
-from telegram import Bot
-from config import BOT_TOKEN, CHAT_ID
-
-bot = Bot(token=BOT_TOKEN)
+from api import get_matches
+from analyzer import analyze_match
+from coupon import create_coupon
+from sender import send_coupon
 
 # =========================================
-# TELEGRAM SEND
+
+# GET MATCHES
+
 # =========================================
 
-def send_coupon(coupon):
+matches = get_matches()
 
-    if not coupon:
-        bot.send_message(
-            chat_id=CHAT_ID,
-            text="⚠️ Uygun BANKO kupon bulunamadı"
-        )
-        return
+analyzed = []
 
-    msg = "🏆 GÜNÜN BANKO KUPONU\n\n"
+for m in matches:
 
-    for i, match in enumerate(coupon, start=1):
-
-        msg += (
-            f"{i}. ⚽ {match['home']} vs {match['away']}\n"
-            f"🎯 Tahmin: {match['prediction']}\n"
-            f"🔥 Güven: %{match['score']}\n"
-            f"📊 Tip: {match['signal']}\n\n"
-        )
-
-        msg += "Analiz:\n"
-
-        for reason in match["reasons"]:
-            msg += f"• {reason}\n"
-
-        msg += "\n"
-
-    bot.send_message(
-        chat_id=CHAT_ID,
-        text=msg
-    )
 ```
+try:
+
+    fake_match = {
+
+        "home": {
+            "name": m["home"],
+            "wins_last5": 4,
+            "points_last5": 11,
+            "home_winrate": 75,
+            "goals_scored_avg": 2.1,
+            "first_half_goal_rate": 70,
+            "h2h_winrate": 65,
+            "missing_players": 1,
+            "motivation": "title",
+            "clean_sheet_rate": 55
+        },
+
+        "away": {
+            "name": m["away"],
+            "wins_last5": 1,
+            "points_last5": 4,
+            "away_lossrate": 65,
+            "goals_scored_avg": 1.0,
+            "missing_players": 3
+        }
+    }
+
+    result = analyze_match(fake_match)
+
+    analyzed.append(result)
+
+except Exception as e:
+    print(e)
+```
+
+# =========================================
+
+# CREATE COUPON
+
+# =========================================
+
+coupon = create_coupon(analyzed)
+
+# =========================================
+
+# SEND
+
+# =========================================
+
+send_coupon(coupon)
