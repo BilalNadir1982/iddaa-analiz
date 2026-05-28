@@ -9,5 +9,7 @@ def analyze_matches(match_list):
     sorted_matches = sorted(match_list, key=lambda x: x['confidence'], reverse=True)
     
     # En iyi 5 maçı seçerek kupon oluşturucuya gönder
-    selected_predictions = sorted_matches[:5]
-    return selected_predictions
+    return sorted_matches[:5]
+
+# Projedeki diğer eski dosyaların hata vermemesi için takma isim (alias) tanımlıyoruz
+analyze_match = analyze_matches
