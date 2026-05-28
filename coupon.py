@@ -1,9 +1,7 @@
 def create_coupon(matches):
 
-    banko = []
+    banko = [m for m in matches if m["score"] >= 85]
 
-    for m in matches:
-        if m["score"] >= 85:
-            banko.append(m)
+    banko = sorted(banko, key=lambda x: x["score"], reverse=True)
 
     return banko[:3]
