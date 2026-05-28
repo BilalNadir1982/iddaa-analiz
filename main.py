@@ -133,16 +133,16 @@ def run_morning_session(raw_matches):
         
     msg += "\n📊 **Yatırım Güven Endeksi:** `🟪🟪🟪🟪🟪🟪🟪🟪⬜⬜ %85+`\n"
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
-    
-    msg += "⚠️ **ÖNEMLİ NOT:** Aşağıdaki panelleri ilk kez kullanacaksanız, lütfen önce bota girip alttaki **[BAŞLAT / START]** butonuna bir kez tıklayın! Aksi takdirde hata alabilirsiniz.\n\n"
-    msg += "👇 **Maçların Detay Matrisleri İçin Seçim Yapın:**"
+    msg += "👇 **Güncel Matris Raporları ve Bildirimler İçin Kanalımızı Takip Edin:**"
 
-    # GÜNCELLENEN DOĞRU BOT ADI
-    bot_username = "iddaaanalizbotubot"
+    # 💡 ÜYELERİ BOŞ BOTA GÖNDERMEK YERİNE DOĞRUDAN KANALA VEYA ÖZEL LİNKE YÖNLENDİRİYORUZ
+    # CHAT_ID'nin başındaki -100 kısmını kaldırarak kanal kullanıcı adınla ya da davet linkinle değiştirebilirsin.
+    # Eğer kanalın herkese açıksa doğrudan 'https://t.me/kanal_kullanici_adi' yazabilirsin.
+    kanal_linki = f"https://t.me/c/{str(CHAT_ID).replace('-100', '')}" if CHAT_ID and str(CHAT_ID).startswith('-100') else "https://t.me/"
     
     inline_keyboard = [
-        [InlineKeyboardButton("⏱️ İY / MS MATRIX PANELİ", url=f"https://t.me/{bot_username}?start=iyms")],
-        [InlineKeyboardButton("⚽ TÜM GOL VE KG VAR ANALİZLERİ", url=f"https://t.me/{bot_username}?start=goller")]
+        [InlineKeyboardButton("⏱️ GÜNCEL İY / MS MATRIX PANELİ", url=kanal_linki)],
+        [InlineKeyboardButton("⚽ TÜM GOL VE KG VAR ANALİZLERİ", url=kanal_linki)]
     ]
     
     send_telegram_with_buttons(msg, inline_keyboard)
@@ -160,9 +160,8 @@ def run_live_betting_session(raw_matches):
     msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
     msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
     
-    # GÜNCELLENEN DOĞRU BOT ADI
-    bot_username = "iddaaanalizbotubot"
-    inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=f"https://t.me/{bot_username}?start=grafik")]]
+    kanal_linki = f"https://t.me/c/{str(CHAT_ID).replace('-100', '')}" if CHAT_ID and str(CHAT_ID).startswith('-100') else "https://t.me/"
+    inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=kanal_linki)]]
     
     send_telegram_with_buttons(msg, inline_keyboard)
 
