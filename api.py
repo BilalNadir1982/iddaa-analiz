@@ -1,49 +1,78 @@
-# =========================================
+```python
 # api.py
-# =========================================
 
 import requests
-from datetime import datetime
 from config import API_KEY
+
+# =========================================
+# API SETTINGS
+# =========================================
+
+BASE_URL = "https://api.football-data.org/v4"
+
+HEADERS = {
+    "X-Auth-Token": API_KEY
+}
+
+# =========================================
+# LEAGUES
+# =========================================
+
+LEAGUES = [
+    "WC",     # FIFA World Cup
+    "CL",     # Champions League
+    "BL1",    # Bundesliga
+    "DED",    # Eredivisie
+    "BSA",    # Brazil Serie A
+    "PD",     # La Liga
+    "FL1",    # Ligue 1
+    "ELC",    # Championship
+    "PPL",    # Portugal
+    "EC",     # Euro
+    "SA",     # Serie A
+    "PL"      # Premier League
+]
+
+# =========================================
+# GET MATCHES
+# =========================================
 
 def get_matches():
 
-    today = datetime.now().strftime("%Y-%m-%d")
+    all_matches = []
 
-    url = f"https://v3.football.api-sports.io/fixtures?date={today}"
+    for league in LEAGUES:
 
-    headers = {
-        "x-apisports-key": API_KEY
-    }
-
-    response = requests.get(url, headers=headers)
-
-    data = response.json()
-
-    matches = []
-
-    if "response" not in data:
-        return matches
-
-    for m in data["response"]:
+        url = f"{BASE_URL}/competitions/{league}/matches"
 
         try:
 
-            matches.append({
+            response = requests.get(
+                url,
+                headers=HEADERS
+            )
 
-                "home": m["teams"]["home"]["name"],
-                "away": m["teams"]["away"]["name"],
+            data = response.json()
 
-                "home_goals": m["goals"]["home"] or 0,
-                "away_goals": m["goals"]["away"] or 0,
+            matches = data.get("matches", [])
 
-                "minute": m["fixture"]["status"]["elapsed"] or 0,
+            for match in matches:
 
-                "league": m["league"]["name"]
+                # Sadece yaklaşan maçlar
+                if match["status"] != "TIMED":
+                    continue
 
-            })
+                home = match["homeTeam"]["name"]
+                away = match["awayTeam"]["name"]
 
-        except:
-            pass
+                all_matches.append({
+                    "league": league,
+                    "home": home,
+                    "away": away
+                })
 
-    return matches
+        except Exception as e:
+            print(f"HATA: {league} -> {e}")
+
+    return all_matches
+```
