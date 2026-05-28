@@ -4,16 +4,6 @@ import json
 from datetime import datetime
 
 # ==========================================
-# GİRİŞ: TELEGRAM KLASİK SINIF SIMÜLASYONU
-# ==========================================
-class InlineKeyboardButton:
-    def __init__(self, text, url):
-        self.text = text
-        self.url = url
-    def to_dict(self):
-        return {"text": self.text, "url": self.url}
-
-# ==========================================
 # 1. AYARLAR & YAPILANDIRMA
 # ==========================================
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -29,29 +19,21 @@ TAKIP_EDILEN_LIGLER = {
 }
 
 # ==========================================
-# Gelişmiş Telegram Araçları (Buton Destekli)
+# 2. TELEGRAM KLASİK GÖNDERİM MOTORU
 # ==========================================
-def send_telegram_with_buttons(text, inline_keyboard=None):
+def send_telegram_message(text):
+    """Mesajları saf, temiz ve şık bir şekilde kanala fırlatır."""
     if not BOT_TOKEN or not CHAT_ID: return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    
-    serialized_keyboard = []
-    if inline_keyboard:
-        for row in inline_keyboard:
-            serialized_row = [btn.to_dict() for btn in row]
-            serialized_keyboard.append(serialized_row)
-
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
         "parse_mode": "Markdown"
     }
-    if inline_keyboard:
-        payload["reply_markup"] = json.dumps({"inline_keyboard": serialized_keyboard})
-        
     requests.post(url, json=payload)
 
 def send_telegram_poll(question, options):
+    """Kanal içi etkileşimi artıran anketi fırlatır."""
     if not BOT_TOKEN or not CHAT_ID: return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPoll"
     payload = {
@@ -63,9 +45,10 @@ def send_telegram_poll(question, options):
     requests.post(url, json=payload)
 
 # ==========================================
-# VERİ & İSTATİSTİK MOTORU
+# 3. VERİ & İSTATİSTİK MOTORU
 # ==========================================
 def fetch_daily_matches():
+    """Bültendeki gerçek ve güncel maçları çeker."""
     if not FOOTBALL_API_KEY or "BURAYA" in FOOTBALL_API_KEY:
         return get_fallback_data()
     headers = {"X-Auth-Token": FOOTBALL_API_KEY}
@@ -87,9 +70,6 @@ def fetch_daily_matches():
         except: continue
     return tum_maclar if tum_maclar else get_fallback_data()
 
-def get_team_stats(team_id):
-    return {"avg_goals_scored": 1.6, "avg_goals_conceded": 1.1}
-
 def get_fallback_data():
     return [
         {"league": "Brezilya Serie A", "home": "Flamengo", "away": "Palmeiras", "home_id": 17, "away_id": 18},
@@ -97,9 +77,10 @@ def get_fallback_data():
     ]
 
 # ==========================================
-# AKTİF OTOMASYON MODÜLLERİ
+# 4. AKTİF OTOMASYON MODÜLLERİ (SADE & NET)
 # ==========================================
 def run_morning_session(raw_matches):
+    """SABAH MODÜLÜ: Skor Tahminli VIP Analiz Mesajı & Banko Anketi"""
     if not raw_matches: return
     
     kupon_maclari = []
@@ -117,6 +98,7 @@ def run_morning_session(raw_matches):
         if len(anket_secenekleri) < 3:
             anket_secenekleri.append(f"{match['home']} - {match['away']}")
 
+    # Görkemli VIP Şablonu
     msg = "💎 ═══  **VIP YAPAY ZEKA ANALİZİ** ═══ 💎\n"
     msg += "🔥 *İstatistik Analizleriyle Gecenin Gold Bülteni Hazır!*\n\n"
     
@@ -133,46 +115,37 @@ def run_morning_session(raw_matches):
         
     msg += "\n📊 **Yatırım Güven Endeksi:** `🟪🟪🟪🟪🟪🟪🟪🟪⬜⬜ %85+`\n"
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
-    msg += "👇 **Güncel Matris Raporları ve Bildirimler İçin Kanalımızı Takip Edin:**"
+    msg += "🔔 *Bildirimleri açmayı ve kuponları takip etmeyi unutmayın!*"
 
-    # 💡 ÜYELERİ BOŞ BOTA GÖNDERMEK YERİNE DOĞRUDAN KANALA VEYA ÖZEL LİNKE YÖNLENDİRİYORUZ
-    # CHAT_ID'nin başındaki -100 kısmını kaldırarak kanal kullanıcı adınla ya da davet linkinle değiştirebilirsin.
-    # Eğer kanalın herkese açıksa doğrudan 'https://t.me/kanal_kullanici_adi' yazabilirsin.
-    kanal_linki = f"https://t.me/c/{str(CHAT_ID).replace('-100', '')}" if CHAT_ID and str(CHAT_ID).startswith('-100') else "https://t.me/"
+    # Mesajı doğrudan kanala gönder
+    send_telegram_message(msg)
     
-    inline_keyboard = [
-        [InlineKeyboardButton("⏱️ GÜNCEL İY / MS MATRIX PANELİ", url=kanal_linki)],
-        [InlineKeyboardButton("⚽ TÜM GOL VE KG VAR ANALİZLERİ", url=kanal_linki)]
-    ]
-    
-    send_telegram_with_buttons(msg, inline_keyboard)
-    
+    # Anketi peşine fırlat
     if len(anket_secenekleri) >= 2:
         send_telegram_poll("🤖 Yapay zekanın çıkardığı maçlardan sizce hangisi gecenin en güvenli BANKOSU?", anket_secenekleri)
 
 def run_live_betting_session(raw_matches):
+    """AKŞAM MODÜLÜ: Canlı Kasa Katlama Sinyali"""
     if not raw_matches: return
     target = raw_matches[0]
     
     msg = "⚡ ═══  **CANLI KASA KATLAMA SİNYALİ** ═══ ⚡\n"
     msg += f"⚽ **Maç:** {target['home']} - {target['away']} ({target['league']})\n"
     msg += "⏱️ **Dakika:** `60' - 65' Arası`\n"
-    msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n"
-    msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir.*"
+    msg += "🎯 **CANLI TAHMİN:** `MAÇTA 1 GOL DAHA OLUR (0.5 ÜST)`\n\n"
+    msg += "🔥 **VIP Canlı Değerlendirme:** *Kasa katlama serimiz için yüksek güven değerindedir. Değerlendiren herkese bol şans!*"
     
-    kanal_linki = f"https://t.me/c/{str(CHAT_ID).replace('-100', '')}" if CHAT_ID and str(CHAT_ID).startswith('-100') else "https://t.me/"
-    inline_keyboard = [[InlineKeyboardButton("📊 ANLIK TAKIM GRAFİKLERİ", url=kanal_linki)]]
-    
-    send_telegram_with_buttons(msg, inline_keyboard)
+    send_telegram_message(msg)
 
 def run_weekly_report():
+    """PAZAR GECESİ MODÜLÜ: Şeffaf Başarı Raporu"""
     msg = "📊 ═══ **HAFTALIK YAPAY ZEKA BAŞARI RAPORU** ═══ 📊\n"
     msg += "📈 **HAFTALIK NET BAŞARI ORANI: `% 82.1`**\n"
-    msg += "🔹 *Yapay zeka algoritması matematik kullanır, şansa yer bırakmaz.*"
-    send_telegram_with_buttons(msg)
+    msg += "🔹 *Yapay zeka algoritması istatistik ve matematik kullanır, şansa yer bırakmaz.*"
+    send_telegram_message(msg)
 
 # ==========================================
-# SAAT KONTROL MERKEZİ
+# 5. SAAT KONTROL MERKEZİ
 # ==========================================
 def main():
     current_hour = datetime.now().hour
