@@ -1,23 +1,30 @@
-def format_coupon(selected_matches):
-    """
-    Seçilen maçları şık bir Telegram mesaj formatına dönüştürür.
-    """
-    if not selected_matches:
-        return "🤖 İDDAA ANALİZ BOTU 🤖\n\n⚠️ Analiz motoru kriterlerine uyan BANKO MAÇ YOK."
-        
-    message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n"
-    message += "📊 İstatistiksel Güven Derecesi Yüksek 5 Maçlık Analiz Kuponu:\n\n"
+from api import fetch_daily_matches
+from analyzer import analyze_matches
+from coupon import format_coupon
+from sender import send_coupon
+
+def main():
+    print("Bot çalıştırıldı, analiz süreci başlıyor...")
     
-    emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
+    # 1. Adım: Maç verilerini al
+    raw_matches = fetch_daily_matches()
     
-    for i, match in enumerate(selected_matches):
-        emoji = emojis[i] if i < len(emojis) else "⚽"
-        message += f"{emoji} [{match['league']}] {match['home']} - {match['away']}\n"
-        message += f"   📌 Tahmin: {match['prediction']}\n"
-        message += f"   📈 Güven Skoru: %{match['confidence']}\n\n"
+    # 2. Adım: Filtrele
+    analyzed_matches = analyze_matches(raw_matches)
     
-    message += "🎰 Toplam Tahmini Oran: ~4.50 - 5.50\n"
-    message += "💪 Analiz Motoru Notu: 'Veri tabanındaki geçmiş form durumları ve şut/korner istatistikleri optimize edilerek yapay zeka tarafından seçilmiştir.'\n\n"
-    message += "💰 Bol Şanslar! 💰"
+    # EĞER MAÇ YOKSA TELEGRAM'A MESAJ ATMA, SESSİZCE ÇIK
+    if not analyzed_matches or len(analyzed_matches) < 5:
+        print("Kriterlere uygun yeterli maç bulunamadı. Telegram'a mesaj gönderilmeyecek.")
+        return # Programı burada bitirir, kanala gereksiz yazı atmaz.
     
-    return message
+    # 3. Adım: Maç varsa kuponu hazırla
+    coupon_text = format_coupon(analyzed_matches)
+    
+    # 4. Adım: Kanala gönder
+    print("Kupon hazırlandı, Telegram'a gönderiliyor...")
+    send_coupon(coupon_text)
+    
+    print("İşlem başarıyla tamamlandı!")
+
+if __name__ == "__main__":
+    main()
