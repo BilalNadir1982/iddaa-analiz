@@ -141,7 +141,7 @@ def run_morning_session(raw_matches):
     msg += "👇 **Maçların Detay Matrisleri İçin Yapay Zeka Botumuzu Başlatın:**"
 
     # ⚠️ Kendi bot kullanıcı adını buraya @ işareti olmadan yazmayı unutma!
-    bot_username = "Buraya_Kendi_Bot_Kullanici_Adini_Yaz_Bot" 
+    bot_username = "iddaanalizbotu" 
     
     inline_keyboard = [
         [InlineKeyboardButton("⏱️ İY / MS MATRIX PANELİ", url=f"https://t.me/{bot_username}?start=iyms")],
