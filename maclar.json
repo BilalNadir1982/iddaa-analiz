@@ -1,38 +1,24 @@
 [
   {
     "statusText": "👑 VIP ANALİZ",
-    "score": "79/100",
-    "teams": "Millwall FC - Hull City AFC",
-    "prediction": "2.5 Üst",
-    "note": "Yapay zeka İngiltere Championship analizinde bu karşılaşma için skor tahminini 1 - 1 olarak hesapladı."
-  },
-  {
-    "statusText": "👑 VIP ANALİZ",
-    "score": "75/100",
-    "teams": "Southampton FC - Middlesbrough F",
-    "prediction": "2.5 Üst",
-    "note": "Yapay zeka İngiltere Championship analizinde bu karşılaşma için skor tahminini 1 - 1 olarak hesapladı."
-  },
-  {
-    "statusText": "👑 VIP ANALİZ",
     "score": "83/100",
     "teams": "CA Paranaense - Mirassol FC",
     "prediction": "2.5 Üst",
     "note": "Yapay zeka Brezilya Serie A analizinde bu karşılaşma için skor tahminini 2 - 1 olarak hesapladı."
   },
   {
-    "statusText": "🚨 CANLI RADAR",
+    "statusText": "👑 VIP ANALİZ",
     "score": "78/100",
     "teams": "CR Flamengo - Coritiba FBC",
     "prediction": "Maç Sonucu 1",
-    "note": "Canlı veri tarayıcıları CR Flamengo cephesinde ofansif aksiyon ve yüksek gol beklentisi (xG) yakaladı."
+    "note": "Yapay zeka Brezilya Serie A analizinde bu karşılaşma için skor tahminini 1 - 1 olarak hesapladı."
   },
   {
-    "statusText": "🚨 CANLI RADAR",
+    "statusText": "👑 VIP ANALİZ",
     "score": "92/100",
     "teams": "EC Bahia - Botafogo FR",
-    "prediction": "Karşılıklı Gol Var",
-    "note": "Canlı veri tarayıcıları EC Bahia cephesinde ofansif aksiyon ve yüksek gol beklentisi (xG) yakaladı."
+    "prediction": "Maç Sonucu 1",
+    "note": "Yapay zeka Brezilya Serie A analizinde bu karşılaşma için skor tahminini 2 - 1 olarak hesapladı."
   },
   {
     "statusText": "🚨 CANLI RADAR",
