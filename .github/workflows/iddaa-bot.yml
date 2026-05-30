@@ -1,22 +1,52 @@
-name: VIP İddaa Otomasyonu
+name: Iddaa Radar & Telegram Bot Motoru
 
 on:
   schedule:
-    - cron: '0 7,17,23 * * *' # Türkiye saatiyle sabah 10:00, akşam 20:00 ve gece 02:00 civarlarında otomatik tetiklenir
-  workflow_dispatch: # İstediğin an elinle çalıştırma butonu
+    # Türkiye saatiyle sabah 09:00 (UTC 06:00) ve akşam 19:00 (UTC 16:00) seanslarında otomatik tetiklenir
+    - cron: '0 6 * * *'
+    - cron: '0 16 * * *'
+  workflow_dispatch: # İstediğin zaman GitHub paneli üzerinden elinle başlatabilmen için
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    
+    # GitHub'ın değiştirilen maclar.json dosyasını depoya geri yükleyebilmesi için gerekli yazma izinleri
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - name: Botu Çalıştır
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
-        run: python main.py
+    - name: Depoyu Kontrol Et ve Klonla
+      uses: actions/checkout@v3
+
+    - name: Python Ortamını Kur
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip' # İlerleyen çalıştırmalarda daha hızlı yükleme yapması için cache desteği
+
+    - name: Gerekli Paketleri (Kütüphaneleri) Yükle
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Yapay Zeka Analiz Motorunu Çalıştır
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+        FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+      run: python main.py
+
+    - name: Güncellenmiş Maç Verilerini (maclar.json) Depoya Geri Kaydet
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action Radar"
+        
+        # Sadece maclar.json dosyasındaki değişiklikleri takip et ve ekle
+        git add maclar.json
+        
+        # Eğer yeni maç gelmediyse veya dosya değişmediyse hata vermeden işlemi bitir (exit 0)
+        git commit -m "Otomatik Radar Bülteni Güncellemesi: $(date +'%d.%m.%Y %H:%M')" || exit 0
+        
+        # Değişiklikleri ana depoya fırlat
+        git push
