@@ -12,10 +12,19 @@ API_BASE_URL = "https://api.football-data.org/v4/"
 FOOTBALL_API_KEY = os.getenv("FOOTBALL_API_KEY")
 
 TAKIP_EDILEN_LIGLER = {
-    "BSA": "Brezilya Serie A",
-    "CLI": "Copa Libertadores",
+    TAKIP_EDILEN_LIGLER = {
+    "PL": "İngiltere Premier Lig",
     "ELC": "İngiltere Championship",
-    "WC": "Dünya Kupası Elemeleri"
+    "PD": "İspanya La Liga",
+    "SA": "İtalya Serie A",
+    "BL1": "Almanya Bundesliga",
+    "FL1": "Fransa Ligue 1",
+    "DED": "Hollanda Eredivisie",
+    "PPL": "Portekiz Premier Lig",
+    "BSA": "Brezilya Serie A",
+    "CL": "UEFA Şampiyonlar Ligi",
+    "EC": "Avrupa Şampiyonası",
+    "WC": "Dünya Kupası"
 }
 
 # ==========================================
