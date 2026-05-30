@@ -1,0 +1,30 @@
+[
+  {
+    "statusText": "👑 VIP ANALİZ",
+    "score": "95/100",
+    "teams": "Real Madrid - Barcelona",
+    "prediction": "Maç Sonucu 1",
+    "note": "Yapay zeka modelimiz, ev sahibinin iç saha form grafiğini ve sakatlık raporlarını analiz ederek yüksek güven oranı verdi."
+  },
+  {
+    "statusText": "⚡ CANLI RADAR",
+    "score": "88/100",
+    "teams": "Liverpool - Arsenal",
+    "prediction": "2.5 Gol Üstü",
+    "note": "Her iki takımın da son 5 maçtaki gol beklentisi (xG) oranları oldukça yüksek. Tempolu ve bol gollü bir maç bekleniyor."
+  },
+  {
+    "statusText": "💎 KASA KATLAMA",
+    "score": "92/100",
+    "teams": "Bayern Münih - Dortmund",
+    "prediction": "Karşılıklı Gol Var",
+    "note": "Aralarındaki son 10 derbi mücadelesinin 9'unda iki takım da fileleri havalandırdı. İstatistiksel olarak güvenli bölge."
+  },
+  {
+    "statusText": "🔥 SİSTEM KUPONU",
+    "score": "84/100",
+    "teams": "Inter - AC Milan",
+    "prediction": "İlk Yarı 0 (Beraberlik)",
+    "note": "Derbi stresinden dolayı iki takımın da maça kontrollü başlaması ve ilk yarıda risk almaması bekleniyor."
+  }
+]
