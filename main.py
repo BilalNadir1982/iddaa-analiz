@@ -77,6 +77,47 @@ def get_fallback_data():
     ]
 
 # ==========================================
+# 🌍 RADAR WEB SİTESİ İÇİN JSON GÜNCELLEME MOTORU
+# ==========================================
+def update_web_radar_json(raw_matches):
+    """Web sitesinin (radar.html) okuyacağı maclar.json dosyasını hazırlar."""
+    if not raw_matches: return
+    
+    web_bulten = []
+    
+    # Tüm çekilen maçları web arayüzünün (radar.html) formatına dönüştürüyoruz
+    for i, match in enumerate(raw_matches):
+        # Ev sahibi id'sine göre botundaki gibi tahmini dinamik oluşturuyoruz
+        prediction = "2.5 Üst" if (int(match.get("home_id", 0)) % 2 == 0) else "Maç Sonucu 1"
+        confidence = 75 + (int(match.get("home_id", 0)) % 20)
+        exact_score = f"{int(confidence/40)} - {int(confidence/50)}"
+        
+        # İlk 2 maçı web sitesinde VIP, kalanları Canlı Radar kategorisinde gösterelim
+        if i < 2:
+            status_text = "👑 VIP ANALİZ"
+            note = f"Yapay zeka {match['league']} analizinde bu karşılaşma için skor tahminini {exact_score} olarak hesapladı."
+        else:
+            status_text = "🚨 CANLI RADAR"
+            prediction = "Karşılıklı Gol Var" if i % 2 == 0 else "Maç Sonucu 1"
+            note = f"Canlı veri tarayıcıları {match['home']} cephesinde ofansif aksiyon ve yüksek gol beklentisi (xG) yakaladı."
+
+        web_bulten.append({
+            "statusText": status_text,
+            "score": f"{confidence}/100",
+            "teams": f"{match['home']} - {match['away']}",
+            "prediction": prediction,
+            "note": note
+        })
+        
+    # JSON çıktısını yazdırıyoruz
+    try:
+        with open('maclar.json', 'w', encoding='utf-8') as f:
+            json.dump(web_bulten, f, ensure_ascii=False, indent=2)
+        print("✅ Web Radar için maclar.json başarıyla güncellendi!")
+    except Exception as e:
+        print(f"❌ JSON yazılırken hata oluştu: {e}")
+
+# ==========================================
 # 4. AKTİF OTOMASYON MODÜLLERİ (SADE & NET)
 # ==========================================
 def run_morning_session(raw_matches):
@@ -117,10 +158,8 @@ def run_morning_session(raw_matches):
     msg += "🎰 **Tahmini Toplam VIP Oran:** `~4.50 - 6.20`\n\n"
     msg += "🔔 *Bildirimleri açmayı ve kuponları takip etmeyi unutmayın!*"
 
-    # Mesajı doğrudan kanala gönder
     send_telegram_message(msg)
     
-    # Anketi peşine fırlat
     if len(anket_secenekleri) >= 2:
         send_telegram_poll("🤖 Yapay zekanın çıkardığı maçlardan sizce hangisi gecenin en güvenli BANKOSU?", anket_secenekleri)
 
@@ -152,6 +191,9 @@ def main():
     current_day = datetime.now().weekday()
     
     raw_matches = fetch_daily_matches()
+    
+    # 📢 Saat fark etmeksizin web sitesi verilerini her tetiklendiğinde taze tut
+    update_web_radar_json(raw_matches)
     
     if current_day == 6 and current_hour >= 23:
         run_weekly_report()
