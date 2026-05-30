@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import time
 from datetime import datetime
 
 # ==========================================
@@ -11,8 +12,8 @@ CHAT_ID = os.getenv("CHAT_ID")
 API_BASE_URL = "https://api.football-data.org/v4/"
 FOOTBALL_API_KEY = os.getenv("FOOTBALL_API_KEY")
 
+# 🔥 Ücretsiz API'nin İzin Verdiği Tüm Ligler Tanımlandı
 TAKIP_EDILEN_LIGLER = {
-    TAKIP_EDILEN_LIGLER = {
     "PL": "İngiltere Premier Lig",
     "ELC": "İngiltere Championship",
     "PD": "İspanya La Liga",
@@ -28,7 +29,7 @@ TAKIP_EDILEN_LIGLER = {
 }
 
 # ==========================================
-# 2. TELEGRAM KLASİK GÖNDERİM MOTORU
+# 2. TELEGRAM GÖNDERİM MOTORU
 # ==========================================
 def send_telegram_message(text):
     """Mesajları saf, temiz ve şık bir şekilde kanala fırlatır."""
@@ -62,6 +63,7 @@ def fetch_daily_matches():
         return get_fallback_data()
     headers = {"X-Auth-Token": FOOTBALL_API_KEY}
     tum_maclar = []
+    
     for lig_kodu, lig_adi in TAKIP_EDILEN_LIGLER.items():
         try:
             url = f"{API_BASE_URL}competitions/{lig_kodu}/matches"
@@ -76,7 +78,13 @@ def fetch_daily_matches():
                             "home_id": match["homeTeam"]["id"],
                             "away_id": match["awayTeam"]["id"]
                         })
-        except: continue
+            
+            # ⏱️ API İstek Sınırına (Rate Limit) Takılmamak İçin 6 Saniye Bekle
+            time.sleep(6)
+            
+        except: 
+            continue
+            
     return tum_maclar if tum_maclar else get_fallback_data()
 
 def get_fallback_data():
@@ -94,15 +102,13 @@ def update_web_radar_json(raw_matches):
     
     web_bulten = []
     
-    # Tüm çekilen maçları web arayüzünün (radar.html) formatına dönüştürüyoruz
     for i, match in enumerate(raw_matches):
-        # Ev sahibi id'sine göre botundaki gibi tahmini dinamik oluşturuyoruz
         prediction = "2.5 Üst" if (int(match.get("home_id", 0)) % 2 == 0) else "Maç Sonucu 1"
         confidence = 75 + (int(match.get("home_id", 0)) % 20)
         exact_score = f"{int(confidence/40)} - {int(confidence/50)}"
         
-        # İlk 2 maçı web sitesinde VIP, kalanları Canlı Radar kategorisinde gösterelim
-        if i < 2:
+        # İlk 3 maçı VIP yapalım, geri kalan tüm maçları Canlı Radar sekmesine gönderelim
+        if i < 3:
             status_text = "👑 VIP ANALİZ"
             note = f"Yapay zeka {match['league']} analizinde bu karşılaşma için skor tahminini {exact_score} olarak hesapladı."
         else:
@@ -118,16 +124,15 @@ def update_web_radar_json(raw_matches):
             "note": note
         })
         
-    # JSON çıktısını yazdırıyoruz
     try:
         with open('maclar.json', 'w', encoding='utf-8') as f:
             json.dump(web_bulten, f, ensure_ascii=False, indent=2)
-        print("✅ Web Radar için maclar.json başarıyla güncellendi!")
+        print("✅ Genişletilmiş Web bülteni maclar.json dosyasına yazıldı!")
     except Exception as e:
         print(f"❌ JSON yazılırken hata oluştu: {e}")
 
 # ==========================================
-# 4. AKTİF OTOMASYON MODÜLLERİ (SADE & NET)
+# 4. AKTİF OTOMASYON MODÜLLERİ
 # ==========================================
 def run_morning_session(raw_matches):
     """SABAH MODÜLÜ: Skor Tahminli VIP Analiz Mesajı & Banko Anketi"""
@@ -148,7 +153,6 @@ def run_morning_session(raw_matches):
         if len(anket_secenekleri) < 3:
             anket_secenekleri.append(f"{match['home']} - {match['away']}")
 
-    # Görkemli VIP Şablonu
     msg = "💎 ═══  **VIP YAPAY ZEKA ANALİZİ** ═══ 💎\n"
     msg += "🔥 *İstatistik Analizleriyle Gecenin Gold Bülteni Hazır!*\n\n"
     
@@ -201,7 +205,7 @@ def main():
     
     raw_matches = fetch_daily_matches()
     
-    # 📢 Saat fark etmeksizin web sitesi verilerini her tetiklendiğinde taze tut
+    # 📡 Saat gözetmeksizin web bültenini (maclar.json) her zaman en güncel gerçek maçlarla doldurur
     update_web_radar_json(raw_matches)
     
     if current_day == 6 and current_hour >= 23:
