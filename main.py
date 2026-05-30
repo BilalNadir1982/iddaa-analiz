@@ -88,9 +88,11 @@ def fetch_daily_matches():
     return tum_maclar if tum_maclar else get_fallback_data()
 
 def get_fallback_data():
+    # Avrupa ligleri bittiği için şu an oynanan aktif Brezilya ligi maçlarını yedek olarak koyuyoruz
     return [
-        {"league": "Brezilya Serie A", "home": "Flamengo", "away": "Palmeiras", "home_id": 17, "away_id": 18},
-        {"league": "Brezilya Serie A", "home": "Sao Paulo", "away": "Botafogo", "home_id": 19, "away_id": 20}
+        {"league": "Brezilya Serie A", "home": "Flamengo", "away": "Vasco da Gama", "home_id": 17, "away_id": 18},
+        {"league": "Brezilya Serie A", "home": "Sao Paulo", "away": "Cruzeiro", "home_id": 19, "away_id": 20},
+        {"league": "Brezilya Serie A", "home": "Fortaleza", "away": "Athletico-PR", "home_id": 21, "away_id": 22}
     ]
 
 # ==========================================
