@@ -1,52 +1,33 @@
-name: Iddaa Radar & Telegram Bot Motoru
+name: Iddaa Bot Runner
 
 on:
+  push:
+    branches: [ main ]
   schedule:
-    # Türkiye saatiyle sabah 09:00 (UTC 06:00) ve akşam 19:00 (UTC 16:00) seanslarında otomatik tetiklenir
-    - cron: '0 6 * * *'
-    - cron: '0 16 * * *'
-  workflow_dispatch: # İstediğin zaman GitHub paneli üzerinden elinle başlatabilmen için
+    # Her gün Türkiye saati ile 08:00'de çalışır
+    - cron: '0 5 * * *' 
+  workflow_dispatch:
 
 jobs:
-  run-bot:
+  build:
     runs-on: ubuntu-latest
-    
-    # GitHub'ın değiştirilen maclar.json dosyasını depoya geri yükleyebilmesi için gerekli yazma izinleri
-    permissions:
-      contents: write
-
     steps:
-    - name: Depoyu Kontrol Et ve Klonla
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Python Ortamını Kur
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
-        cache: 'pip' # İlerleyen çalıştırmalarda daha hızlı yükleme yapması için cache desteği
+        python-version: '3.9'
 
-    - name: Gerekli Paketleri (Kütüphaneleri) Yükle
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install requests beautifulsoup4
 
-    - name: Yapay Zeka Analiz Motorunu Çalıştır
+    - name: Run bot
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
-        FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
-      run: python main.py
-
-    - name: Güncellenmiş Maç Verilerini (maclar.json) Depoya Geri Kaydet
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action Radar"
-        
-        # Sadece maclar.json dosyasındaki değişiklikleri takip et ve ekle
-        git add maclar.json
-        
-        # Eğer yeni maç gelmediyse veya dosya değişmediyse hata vermeden işlemi bitir (exit 0)
-        git commit -m "Otomatik Radar Bülteni Güncellemesi: $(date +'%d.%m.%Y %H:%M')" || exit 0
-        
-        # Değişiklikleri ana depoya fırlat
-        git push
+        python main.py
