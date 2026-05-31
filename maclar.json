@@ -1,5 +1,0 @@
-[
-  {"league": "PREMIER LİG", "home": "Arsenal", "away": "Chelsea", "home_id": 10, "away_id": 20},
-  {"league": "LA LIGA", "home": "Real Madrid", "away": "Barcelona", "home_id": 30, "away_id": 40},
-  {"league": "BUNDESLIGA", "home": "Bayern", "away": "Dortmund", "home_id": 50, "away_id": 60}
-]
