@@ -11,12 +11,12 @@ def main():
     token = os.getenv("BOT_TOKEN")
     chat_id = os.getenv("CHAT_ID")
     
-    # Mesaj gönder
+    # Mesaj
     requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={
         "chat_id": chat_id, "text": format_coupon(analizler), "parse_mode": "Markdown"
     })
     
-    # Anket gönder
+    # Anket
     poll = get_poll_data()
     requests.post(f"https://api.telegram.org/bot{token}/sendPoll", data={
         "chat_id": chat_id, "question": poll["question"], "options": poll["options"]
