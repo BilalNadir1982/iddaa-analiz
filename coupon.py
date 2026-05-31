@@ -1,5 +1,6 @@
 def format_coupon(selected_matches):
-    if not selected_matches: return "⚠️ Analiz edilecek maç bulunamadı."
+    if not selected_matches:
+        return "⚠️ Analiz edilecek maç bulunamadı."
     
     message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n📊 Günün Tüm Maç Analizleri:\n\n"
     
