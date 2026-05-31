@@ -1,14 +1,14 @@
 def format_coupon(selected_matches):
-    if not selected_matches: return "⚠️ Analiz kriterlerine uyan maç yok."
+    if not selected_matches: return "⚠️ Analiz edilecek maç bulunamadı."
     
-    # 1. Analiz Bölümü
-    message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n📊 Detaylı Analizler:\n\n"
+    message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n📊 Günün Tüm Maç Analizleri:\n\n"
+    
     for match in selected_matches:
-        message += f"⚽ {match['home']} - {match['away']}\n📝 {match['detail']}\n📈 %{match['confidence']}\n\n"
+        message += f"⚽ {match['home']} - {match['away']} ({match['league']})\n"
+        message += f"📝 Analiz: {match['detail']}\n"
+        message += f"📈 Güven: %{match['confidence']}\n\n"
         
-    message += "───────────────────────\n\n🎫 **HAZIR KUPON ŞABLONU**\n\n"
-    
-    # 2. Dinamik Liste (Sınırsız Numaralandırma)
+    message += "🎫 **HAZIR KUPON LİSTESİ** 🎫\n"
     for i, match in enumerate(selected_matches):
         message += f"{i+1}️⃣ {match['home']} - {match['away']} ➔ **{match['prediction']}**\n"
         
