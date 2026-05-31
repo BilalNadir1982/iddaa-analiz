@@ -1,14 +1,13 @@
-import json
-
 def format_coupon(matches):
-    msg = "🤖 *GÜNLÜK PROFESYONEL ANALİZ* 🤖\n\n"
-    for i, m in enumerate(matches):
-        msg += f"{i+1}️⃣ {m['home']} - {m['away']}\n⚽ *Lig:* {m['league']}\n📈 *Tahmin:* {m['prediction']} (%{m['confidence']})\n\n"
-    msg += "💰 *Bol Şanslar!*"
+    msg = "💎 ═══  VIP YAPAY ZEKA ANALİZİ ═══ 💎\n"
+    msg += "🔥 İstatistik Analizleriyle Gecenin Gold Bülteni Hazır!\n\n"
+    
+    for m in matches:
+        msg += f"🏆 {m['league']}\n"
+        msg += f"⚽ {m['home']} vs {m['away']}\n"
+        msg += f"🎯 Yapay Zeka Skor Tahmini: {m['score']} 👈\n"
+        msg += f"📊 Güven Skoru / Tahmin: % {m['confidence']} ➔ {m['prediction']}\n"
+        msg += "🔸 ─────────────────────── 🔸\n\n"
+        
+    msg += "🔔 Bildirimleri açmayı ve kuponları takip etmeyi unutmayın!"
     return msg
-
-def get_poll_data():
-    return {
-        "question": "Bu kupon tutar mı?",
-        "options": json.dumps(["✅ Evet", "❌ Hayır"])
-    }
