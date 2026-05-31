@@ -1,32 +1,16 @@
 def format_coupon(selected_matches):
-    """
-    Seçilen maçları hem detaylı analiz hem de sadece oynanabilir 
-    sade kupon formatında tek bir mesajda (veya bölünmüş olarak) hazırlar.
-    """
-    if not selected_matches:
-        return "🤖 İDDAA ANALİZ BOTU 🤖\n\n⚠️ Analiz motoru kriterlerine uyan BANKO MAÇ YOK."
-        
-    # --- 1. BÖLÜM: DETAYLI ANALİZLER ---
-    message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n"
-    message += "📊 Yapay Zeka Detaylı Maç Analizleri:\n\n"
+    if not selected_matches: return "⚠️ Analiz kriterlerine uyan maç yok."
     
+    # 1. Analiz Bölümü
+    message = "🤖 İDDAA ANALİZ BOTU SİNYALİ 🤖\n📊 Detaylı Analizler:\n\n"
+    for match in selected_matches:
+        message += f"⚽ {match['home']} - {match['away']}\n📝 {match['detail']}\n📈 %{match['confidence']}\n\n"
+        
+    message += "───────────────────────\n\n🎫 **HAZIR KUPON ŞABLONU**\n\n"
+    
+    # 2. Dinamik Liste (Sınırsız Numaralandırma)
     for i, match in enumerate(selected_matches):
-        message += f"⚽ {match['home']} - {match['away']} ({match['league']})\n"
-        message += f"📝 **Analiz:** {match['detail']}\n"
-        message += f"📈 **Güven Skoru:** %{match['confidence']}\n\n"
+        message += f"{i+1}️⃣ {match['home']} - {match['away']} ➔ **{match['prediction']}**\n"
         
-    message += "───────────────────────\n\n"
-    
-    # --- 2. BÖLÜM: SADECE KUPON SEKLİNDE GÖRÜNÜM ---
-    message += "🎫 **HAZIR KUPON ŞABLONU** 🎫\n"
-    message += "✍️ *Direkt oynanabilir sade liste:*\n\n"
-    
-    emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
-    for i, match in enumerate(selected_matches):
-        emoji = emojis[i] if i < len(emojis) else "🔹"
-        message += f"{emoji} {match['home']} - {match['away']} ➔ **{match['prediction']}**\n"
-        
-    message += "\n🎰 **Toplam Tahmini Oran:** ~4.50 - 5.50\n"
-    message += "💰 **Bol Şanslar!** 💰"
-    
+    message += "\n💰 **Bol Şanslar!**"
     return message
