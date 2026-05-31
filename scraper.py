@@ -6,8 +6,8 @@ def get_live_matches():
     url = "https://api.football-data.org/v4/matches"
     headers = {"X-Auth-Token": api_key}
     
-    # Senin istediğin ligler
-    allowed = ["WC", "CL", "BL1", "DED", "BSA", "PD", "FL1", "ELC", "PPL", "EC", "SA", "PL", "ARG", "SD"]
+    # Yazın da devam eden ligler dahil güncel liste
+    allowed = ["BSA", "MLS", "J1", "WC", "CL", "BL1", "DED", "PD", "FL1", "ELC", "PPL", "SA", "PL", "ARG", "SD"]
     
     try:
         response = requests.get(url, headers=headers).json()
@@ -19,6 +19,6 @@ def get_live_matches():
                     "home": m['homeTeam']['name'],
                     "away": m['awayTeam']['name']
                 })
-        return matches[:5] # En iyi 5 maç
+        return matches[:5]
     except:
         return []
