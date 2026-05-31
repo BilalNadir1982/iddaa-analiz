@@ -55,8 +55,11 @@ def analyze_matches(match_list):
             "detail": detail
         })
 
-    # Güven skoru en yüksek olan EN GERÇEKÇİ 5 maçı ayıkla
+    # Güven skoru en yüksek olanları sırala ama hepsini döndür
+    # Eğer hepsini istiyorsan [:5] kısmını tamamen sil:
     sirali_maclar = sorted(analiz_sonuclari, key=lambda x: x['confidence'], reverse=True)
-    return sirali_maclar[:5]
+    
+    # Tüm analiz edilmiş maçları döndür
+    return sirali_maclar 
 
 analyze_match = analyze_matches
