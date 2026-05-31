@@ -14,13 +14,19 @@ def send_telegram_message(text):
     payload = {"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}
     requests.post(url, json=payload)
 
-def get_matches_from_json():
-    try:
-        with open('maclar.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"JSON okuma hatası: {e}")
-        return []
+from scraper import get_live_matches
+
+def main():
+    # Artık JSON'a değil, doğrudan canlı siteye gidiyor!
+    raw_matches = get_live_matches()
+    
+    if not raw_matches:
+        print("Şu an canlı maç bulunamadı!")
+        return
+        
+    analizler = analyze_matches(raw_matches)
+    mesaj = format_coupon(analizler)
+    send_telegram_message(mesaj)
 
 def main():
     raw_matches = get_matches_from_json()
