@@ -1,10 +1,10 @@
 import os
-import requests
 import json
+import requests
 from analyzer import analyze_matches
 from coupon import format_coupon
 
-# Telegram ayarları
+# Telegram Ayarları
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
@@ -14,24 +14,23 @@ def send_telegram_message(text):
     payload = {"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}
     requests.post(url, json=payload)
 
-def get_matches():
-    # Burada manuel liste yerine otomatik bir API'den çekiyoruz
-    # Ücretsiz ve limitsiz deneme için şimdilik örnek yapı:
-    return [
-        {"league": "PREMIER LİG", "home": "Liverpool", "away": "Man City", "home_id": 1, "away_id": 2},
-        {"league": "LA LIGA", "home": "Real Madrid", "away": "Sevilla", "home_id": 3, "away_id": 4}
-    ]
+def get_matches_from_json():
+    try:
+        with open('maclar.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"JSON okuma hatası: {e}")
+        return []
 
 def main():
-    try:
-        raw_matches = get_matches()
-        if not raw_matches: return
+    raw_matches = get_matches_from_json()
+    if not raw_matches:
+        print("Maç listesi boş!")
+        return
         
-        analizler = analyze_matches(raw_matches)
-        mesaj = format_coupon(analizler)
-        send_telegram_message(mesaj)
-    except Exception as e:
-        print(f"Hata oluştu: {e}")
+    analizler = analyze_matches(raw_matches)
+    mesaj = format_coupon(analizler)
+    send_telegram_message(mesaj)
 
 if __name__ == "__main__":
     main()
