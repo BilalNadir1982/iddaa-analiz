@@ -2,17 +2,27 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_live_matches():
-    # Canlı sonuçlar sayfasından veriyi çek
+    # Güncel bülten sayfası
     url = "https://www.mackolik.com/canli-sonuclar"
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.content, 'html.parser')
     
-    matches = []
-    # Site yapısına göre maçları bul (class isimleri değişebilir, mackolik yapısı baz alınmıştır)
-    for match in soup.select('.match-item'): # Buradaki class ismi sitenin o anki yapısına göre düzeltilmelidir
-        home = match.select_one('.home-team').text.strip()
-        away = match.select_one('.away-team').text.strip()
-        matches.append({"league": "Güncel Maç", "home": home, "away": away, "home_id": 111, "away_id": 222})
-    
-    return matches[:10] # En güncel 10 maçı döndür
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        matches = []
+        # Sayfadaki maç kutucuklarını bul
+        for item in soup.select('.matches-list-item')[:5]: # Sadece ilk 5 maçı al
+            home = item.select_one('.match-name-home').text.strip()
+            away = item.select_one('.match-name-away').text.strip()
+            league = item.select_one('.league-name').text.strip()
+            
+            matches.append({
+                "league": league,
+                "home": home,
+                "away": away,
+                "home_id": len(home) # Geçici ID
+            })
+        return matches
+    except:
+        return []
