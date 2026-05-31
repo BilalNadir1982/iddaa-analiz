@@ -14,22 +14,14 @@ def send_telegram_message(text):
     requests.post(url, json=payload)
 
 def main():
-    # Canlı maçları scraper'dan çekiyoruz
     raw_matches = get_live_matches()
-    
     if not raw_matches:
-        print("Maç bulunamadı!")
+        print("Maç bulunamadı, işlem durduruldu.")
         return
-        
-    # Analiz et
     analizler = analyze_matches(raw_matches)
-    
-    # Kupon hazırla
     mesaj = format_coupon(analizler)
-    
-    # Gönder
     send_telegram_message(mesaj)
-    print("Mesaj başarıyla gönderildi.")
+    print("Mesaj gönderildi.")
 
 if __name__ == "__main__":
     main()
