@@ -8,4 +8,4 @@ def format_coupon(matches):
     return msg
 
 def get_poll_data():
-    return {"question": "Bu kupon tutar mı?", "options": json.dumps(["✅ Evet", "❌ Hayır"])}
+    return {"question": "Yapay zekanın tahmini tutar mı?", "options": json.dumps(["✅ Kesinlikle", "❌ Riskli"])}
