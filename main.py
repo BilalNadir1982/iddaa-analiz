@@ -11,17 +11,13 @@ def main():
     haber_text = get_latest_news()
     matches = get_live_matches()
     
-    # Haber gelmediyse ve maç da yoksa mesaj atma
-    if "Şu an haber akışına bağlanılamıyor" in haber_text and not matches:
-        return 
-
     msg = f"☀️ *GÜNÜN SPOR GÜNDEMİ*\n\n{haber_text}\n\n"
     
     if matches:
         analizler = analyze_matches(matches)
         msg += f"💎 *YAPAY ZEKA ANALİZİ*\n\n{format_coupon(analizler)}"
     else:
-        msg += "⚽ *Bugün bültende maç bulunamadı.*"
+        msg += "⚽ *Bugün ve yarın bültende maç bulunamadı.*"
 
     requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={
         "chat_id": chat_id, "text": msg, "parse_mode": "Markdown"
