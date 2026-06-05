@@ -1,5 +1,4 @@
-import os
-import requests
+import os, requests
 from datetime import datetime, timedelta
 
 def get_live_matches():
@@ -8,7 +7,8 @@ def get_live_matches():
     allowed = ["BSA", "ARG"] 
     
     matches = []
-    for days in range(2): # Bugün ve yarın
+    # Bugün ve yarını kontrol eder
+    for days in range(2):
         date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
         url = f"https://api.football-data.org/v4/matches?date={date}"
         try:
