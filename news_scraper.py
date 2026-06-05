@@ -1,16 +1,15 @@
 import requests
-import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 
 def get_latest_news():
-    url = "https://www.ntv.com.tr/spor.rss" # Spor haberleri kaynağı
+    # Hurriyet Spor sayfası
+    url = "https://www.hurriyet.com.tr/spor/"
     try:
-        response = requests.get(url, timeout=10)
-        root = ET.fromstring(response.content)
-        news = []
-        for item in root.findall('.//item'):
-            title = item.find('title').text
-            news.append(f"📰 {title}")
-            if len(news) >= 3: break
-        return "\n".join(news)
+        response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        headlines = []
+        for h in soup.find_all('h3', limit=3): # İlk 3 başlığı al
+            headlines.append(f"📰 {h.get_text().strip()}")
+        return "\n".join(headlines)
     except:
-        return "📰 Güncel spor haberleri şu an alınamadı."
+        return "📰 Şu an haber akışına bağlanılamıyor."
