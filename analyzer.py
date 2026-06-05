@@ -11,6 +11,6 @@ def analyze_matches(match_list):
             "away": m["away"],
             "score": f"{skor1} - {skor2}",
             "prediction": "Maç Sonucu 1" if skor1 > skor2 else "2.5 Üst",
-            "confidence": random.randint(78, 94)
+            "confidence": random.randint(80, 95)
         })
     return results
