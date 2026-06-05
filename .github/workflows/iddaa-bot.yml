@@ -1,33 +1,30 @@
-name: Iddaa Bot Runner
+name: Bot Calistir
 
 on:
-  push:
-    branches: [ main ]
   schedule:
-    # Her gün Türkiye saati ile 08:00'de çalışır
-    - cron: '0 5 * * *' 
-  workflow_dispatch:
+    - cron: '0 9 * * *'  # Her sabah saat 09:00'da otomatik çalışır
+  workflow_dispatch:     # Manuel olarak "Run workflow" tuşuna basmanı sağlar
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Kodu cek
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Python kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests beautifulsoup4
+      - name: Gerekli kutuphaneleri yukle
+        run: |
+          pip install requests beautifulsoup4
 
-    - name: Run bot
-      env:
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        CHAT_ID: ${{ secrets.CHAT_ID }}
-      run: |
-        python main.py
+      - name: Botu calistir
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+        run: |
+          python main.py
