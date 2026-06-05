@@ -8,13 +8,13 @@ def main():
     token = os.getenv("BOT_TOKEN")
     chat_id = os.getenv("CHAT_ID")
     
-    # 1. Haberleri Çek
     haber_text = get_latest_news()
-    
-    # 2. Maçları Çek
     matches = get_live_matches()
     
-    # 3. Mesajı Oluştur
+    # Haber gelmediyse ve maç da yoksa mesaj atma
+    if "Şu an haber akışına bağlanılamıyor" in haber_text and not matches:
+        return 
+
     msg = f"☀️ *GÜNÜN SPOR GÜNDEMİ*\n\n{haber_text}\n\n"
     
     if matches:
@@ -23,7 +23,6 @@ def main():
     else:
         msg += "⚽ *Bugün bültende maç bulunamadı.*"
 
-    # 4. Telegram'a Gönder
     requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={
         "chat_id": chat_id, "text": msg, "parse_mode": "Markdown"
     })
