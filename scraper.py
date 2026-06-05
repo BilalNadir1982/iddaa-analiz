@@ -1,24 +1,28 @@
 import os
 import requests
+from datetime import datetime, timedelta
 
 def get_live_matches():
     api_key = os.getenv("FOOTBALL_API_KEY")
-    url = "https://api.football-data.org/v4/matches"
     headers = {"X-Auth-Token": api_key}
+    # Sadece aktif ligler
+    allowed = ["BSA", "ARG"] 
     
-    # Yazın da devam eden ligler dahil güncel liste
-    allowed = ["BSA", "MLS", "J1", "WC", "CL", "BL1", "DED", "PD", "FL1", "ELC", "PPL", "SA", "PL", "ARG", "SD"]
+    # Bugün ve Yarın için maçları çek
+    today = datetime.now().strftime("%Y-%m-%d")
+    tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     
-    try:
-        response = requests.get(url, headers=headers).json()
-        matches = []
-        for m in response.get('matches', []):
-            if m['competition']['code'] in allowed:
-                matches.append({
-                    "league": m['competition']['name'],
-                    "home": m['homeTeam']['name'],
-                    "away": m['awayTeam']['name']
-                })
-        return matches[:5]
-    except:
-        return []
+    matches = []
+    for date in [today, tomorrow]:
+        url = f"https://api.football-data.org/v4/matches?date={date}"
+        try:
+            response = requests.get(url, headers=headers).json()
+            for m in response.get('matches', []):
+                if m['competition']['code'] in allowed:
+                    matches.append({
+                        "league": m['competition']['name'],
+                        "home": m['homeTeam']['name'],
+                        "away": m['awayTeam']['name']
+                    })
+        except: continue
+    return matches[:5] # En fazla 5 maç
