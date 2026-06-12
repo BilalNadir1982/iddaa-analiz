@@ -1,24 +1,30 @@
-import os, requests
-from datetime import datetime, timedelta
+import os
+import requests
+from datetime import datetime
 
-def get_live_matches():
-    api_key = os.getenv("FOOTBALL_API_KEY")
-    headers = {"X-Auth-Token": api_key}
-    allowed = ["BSA", "ARG"] 
-    
+API_KEY = os.getenv("API_FOOTBALL_KEY")
+BASE_URL = "https://v3.football.api-sports.io/fixtures"
+
+def get_today_matches():
+    today = datetime.today().strftime("%Y-%m-%d")
+    headers = {"x-apisports-key": API_KEY}
+    params = {"date": today}
+
+    response = requests.get(BASE_URL, headers=headers, params=params)
+    if response.status_code != 200:
+        print(f"API Hatası: {response.status_code}")
+        return []
+
+    data = response.json()
     matches = []
-    # Bugün ve yarını kontrol eder
-    for days in range(2):
-        date = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
-        url = f"https://api.football-data.org/v4/matches?date={date}"
-        try:
-            response = requests.get(url, headers=headers).json()
-            for m in response.get('matches', []):
-                if m['competition']['code'] in allowed:
-                    matches.append({
-                        "league": m['competition']['name'],
-                        "home": m['homeTeam']['name'],
-                        "away": m['awayTeam']['name']
-                    })
-        except: continue
-    return matches[:5]
+    for match in data.get("response", []):
+        matches.append({
+            "home": match["teams"]["home"]["name"],
+            "away": match["teams"]["away"]["name"],
+            "league": match["league"]["name"]
+        })
+    return matches
+
+if __name__ == "__main__":
+    matches = get_today_matches()
+    print(matches)
